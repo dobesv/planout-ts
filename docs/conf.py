@@ -15,6 +15,9 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import os
+import os.path
+project_root = os.path.dirname(os.path.dirname(__file__))
 
 
 # -- Project information -----------------------------------------------------
@@ -173,10 +176,11 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
-js_source_path = '../src'
+js_source_path = os.path.join(project_root, 'src')
 js_language = 'typescript'
 
-import os
-import os.path
-if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "node_modules")):
+if not os.path.exists(os.path.join(project_root, "node_modules")):
+    pwd = os.getcwd()
+    os.chdir(project_root)
     os.system("npm install")
+    os.chdir(pwd)
