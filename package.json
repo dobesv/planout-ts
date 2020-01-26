@@ -27,6 +27,7 @@
     "jsdoc": "^3.6.3",
     "jsdoc-to-markdown": "^5.0.3",
     "prettier": "^1.19.1",
+    "typedoc": "^0.16.9",
     "typescript": "^3.7.5"
   }
 }
