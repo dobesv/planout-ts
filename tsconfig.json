@@ -2,6 +2,7 @@
   "include": ["src/**.ts"],
   "compilerOptions": {
     "esModuleInterop": true,
+    "module": "CommonJS",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
