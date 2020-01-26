@@ -1,0 +1,11 @@
+{
+  "include": ["src/**.ts"],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "outDir": "dist",
+    "types": ["node", "jest"]
+  }
+}
