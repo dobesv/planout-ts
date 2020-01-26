@@ -153,11 +153,11 @@ const experiment = <T = void>(name: string, environment?: T) => ({
       case "not":
         return !this.evalBool(code.value);
       case "product":
-        return this.evalNumArray(code.values).reduce((p, v) =>
+        return this.evalNumArray(code.values).reduce((p: number, v: number) =>
           typeof v === "number" ? p * v : p
         );
       case "sum":
-        return this.evalNumArray(code.values).reduce((p, v) =>
+        return this.evalNumArray(code.values).reduce((p: number, v: number) =>
           typeof v === "number" ? p + v : p
         );
       case "randomFloat":
@@ -225,7 +225,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
   },
 
   evalNumArray: function(values: PlanoutCode[]) {
-    return this.evalArray(values).map(elt => this.evalNum(elt));
+    return this.evalArray(values).map((elt: PlanoutCode) => this.evalNum(elt));
   },
 
   evalString(code: PlanoutCode): string {

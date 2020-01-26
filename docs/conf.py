@@ -178,5 +178,5 @@ js_language = 'typescript'
 
 import os
 import os.path
-if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "node_modules"):
+if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "node_modules")):
     os.system("npm install")

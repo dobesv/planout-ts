@@ -4,8 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "jest"
+    "build": "yarn build:js && yarn build:docs",
+    "build:js": "tsc",
+    "build:docs": "sphinx-build docs docs/_build/html",
+    "test": "jest && tsc --noEmit"
   },
   "keywords": [],
   "author": "",
