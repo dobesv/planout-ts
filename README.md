@@ -11,11 +11,11 @@ deterministically based on the a user ID or client ID.
 This can also be used to rollout a feature to a subset of users and see whether
 they experience additional errors as a result.
 
-## Installation
+### Installation
 
     yarn add planout-ts
     
-## Usage
+### Usage
 
 When running an experiment, you use two pieces of information: 
 
@@ -70,13 +70,49 @@ You should be able to create segments in your analytics database based on which
 users triggered the event for each variant, and then compare the frequency of 
 your desired outcome between the groups.
 
-## Documentation
+If you want to do some kind of multivariate testing you can call `choice` once for
+each variable, and then combine the resulting variables together.  Just be aware
+that `choice` always returns the same array index for the same experiment `name` &
+`salt`, so you must vary at least one of these for each variable or the variables
+will no be "mixed up" as intended.
+
+### Using PlanOut Scripts
+
+Part of PlanOut is the PlanOut language.  You can read about the language here:
+
+* https://facebook.github.io/planout/docs/planout-language.html
+
+To use PlanOut scripts with this package, you must compile them to JSON, parse the
+JSON to objects, and pass it to `evalCode`.  Provide an initial variable state
+(especially anything you want to use as a `salt`, which is called the `unit` in
+the scripting language) as an object last parameter to the experiment call.
+
+The script will assign any experiment variables / parameters and you can read
+the calculated values by calling `get` on the experiment.
+
+The idea behind the planout scripts is that you can make the system a bit more
+abstract - the "knobs and levers" are the variables set by the PlanOut language
+script, and the PlanOut language scripts are stored in some repository and
+edited separately from the code.
+
+The main use case I am aware of for this is that you can use it to allow the
+experiment parameters to evolve dynamically without updating the application
+code.  A feature can be added an initially distributed only to internal 
+testers.  Later, some percentage of end users are exposed to the new feature.
+Finally, the feature can be enabled for everyone - or disabled.
+
+In this model the application provides various useful pieces of information
+about the current user (if there is one) as part of the experiment, loads
+and runs compiled PlanOut scripts from the database, and then updates the
+user experience according to the variables set by the experiment scripts.
+
+### API Documentation
 
 There's API documentation describing all the generator functions available here:
 
 * https://planout-ts.readthedocs.io/
 
-## Making use of the results
+### Making use of the results
 
 Note that analyzing these results and making good decisions based on them can be pretty 
 tricky and this library doesn't (yet) offer any assistance in the matter.
@@ -86,3 +122,8 @@ A good starting point for research on the matter might be [this blog](https://ww
 You may find it difficult or even impossible to actually use Google Analytics for this
 purpose and instead you may wish to stream your analytics events into another service
 that lets you keep and analyze all the events separately.
+
+### Future Work
+
+* PlanOut style namespace for mutually exclusive experiments selected at random
+
