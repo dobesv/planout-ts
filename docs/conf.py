@@ -175,3 +175,8 @@ epub_exclude_files = ['search.html']
 # -- Extension configuration -------------------------------------------------
 js_source_path = '../src'
 js_language = 'typescript'
+
+import os
+import os.path
+if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "node_modules"):
+    os.system("npm install")
