@@ -1,3 +1,4 @@
 import experiment from "./experiment";
 export * from "./PlanoutCode";
-export { experiment };
+import { parse as compile } from "./parser";
+export { compile, experiment };

@@ -1,12 +1,13 @@
 # PlanOut
 
 [PlanOut](http://facebook.github.io/planout/) is a system designed by Facebook to assist in running experiments in
-applications.  This can be used to build your own A/B testing system.
+applications.  This can be used to build your own A/B testing or gradual/partial feature
+rollout system.
 
-This project is a TypeScript (and JavaScript) implemenation of PlanOut.
+This project is a TypeScript/JavaScript implemenation of PlanOut.
 
 To run an A/B test or other experiment, you use the library to select values/variants
-deterministically based on the a user ID or client ID.
+deterministically based on the a user ID, client ID, or other factors.
 
 This can also be used to rollout a feature to a subset of users and see whether
 they experience additional errors as a result.
@@ -97,14 +98,15 @@ edited separately from the code.
 
 The main use case I am aware of for this is that you can use it to allow the
 experiment parameters to evolve dynamically without updating the application
-code.  A feature can be added an initially distributed only to internal 
-testers.  Later, some percentage of end users are exposed to the new feature.
-Finally, the feature can be enabled for everyone - or disabled.
+code.  A feature can be added and distributed to internal testers.  Later,
+some percentage of end users are exposed to the new feature.  Finally, 
+the feature can be enabled for everyone - or disabled.
 
 In this model the application provides various useful pieces of information
-about the current user (if there is one) as part of the experiment, loads
-and runs compiled PlanOut scripts from the database, and then updates the
-user experience according to the variables set by the experiment scripts.
+about the current user (if there is one) as part of the experiment input
+variables, loads and runs compiled PlanOut scripts from the database, and 
+then updates the user experience according to the variables set by the 
+experiment scripts.
 
 ### API Documentation
 
@@ -126,4 +128,3 @@ that lets you keep and analyze all the events separately.
 ### Future Work
 
 * PlanOut style namespace for mutually exclusive experiments selected at random
-

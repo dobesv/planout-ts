@@ -1,6 +1,13 @@
+export interface PlanoutCodeObjectLiteral {
+  [k: string]: PlanoutCodeValue | PlanoutCodeObjectLiteral | undefined;
+}
 export interface PlanoutCodeLiteralOp {
   op: "literal";
-  value: any;
+  value: PlanoutCodeValue | PlanoutCodeObjectLiteral;
+}
+export interface PlanoutCodeArrayOp {
+  op: "array";
+  values: PlanoutCode[];
 }
 export interface PlanoutCodeGetOp {
   op: "get";
@@ -32,7 +39,12 @@ export interface PlanoutCodeCommutativeOp {
   op: "min" | "max" | "product" | "sum";
   values: PlanoutCode[];
 }
-export type PlanoutCodeValue = string | number | boolean | null;
+export type PlanoutCodeValue =
+  | string
+  | number
+  | boolean
+  | null
+  | PlanoutCodeValue[];
 
 export interface PlanoutCodeRandomRangeOp {
   op: "randomFloat" | "randomInteger";
@@ -76,6 +88,7 @@ export type PlanoutCodeCoreOp =
   | PlanoutCodeSeqOp
   | PlanoutCodeCondOp
   | PlanoutCodeLiteralOp
+  | PlanoutCodeArrayOp
   | PlanoutCodeBinaryOp
   | PlanoutCodeUnaryOp
   | PlanoutCodeCommutativeOp;
@@ -83,5 +96,4 @@ export type PlanoutCodeCoreOp =
 export type PlanoutCode =
   | PlanoutCodeValue
   | PlanoutCodeCoreOp
-  | PlanoutCodeRandomOp
-  | PlanoutCode[];
+  | PlanoutCodeRandomOp;

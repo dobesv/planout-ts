@@ -1,8 +1,14 @@
 import defaultTo from "lodash/defaultTo";
+import flattenDeep from "lodash/flattenDeep";
 import sha1 from "sha1";
-import { PlanoutCode } from "./PlanoutCode";
+import { PlanoutCode, PlanoutCodeValue } from "./PlanoutCode";
 
-const experiment = <T = void>(name: string, environment?: T) => ({
+type SaltType = PlanoutCodeValue;
+
+const experiment = (
+  name: string,
+  environment: { [k: string]: PlanoutCodeValue | undefined } = {}
+) => ({
   environment,
 
   /**
@@ -21,9 +27,9 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param salt Used to get different values from multiple calls to the same experiment, for A/B tests
    *     this would be the user's client ID or user ID
    */
-  hash(salt: string | number): number {
+  hash(salt: SaltType): number {
     if (!this.enabled) return 0;
-    return parseInt(sha1([name, String(salt)].join(".")).slice(0, 13), 16);
+    return parseInt(sha1(flattenDeep([name, salt]).join(".")).slice(0, 13), 16);
   },
 
   /**
@@ -34,7 +40,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param name Variable name
    * @param def Default value if the value could not be found
    */
-  get<K extends keyof T>(name: K, def: T[K]): T[K] {
+  get(name: string, def: PlanoutCodeValue): PlanoutCodeValue {
     return defaultTo(environment[name], def);
   },
 
@@ -47,7 +53,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param name Variable name
    * @param value Value to save
    */
-  set<K extends keyof T>(name: K, value: T[K]): void {
+  set(name: string, value: PlanoutCodeValue): void {
     environment[name] = value;
   },
 
@@ -56,8 +62,10 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    *
    * @param name Variable name
    */
-  del<K extends keyof T>(name: K): void {
-    delete environment[name];
+  del(name: string): void {
+    if (environment.hasOwnProperty(name)) {
+      delete environment[name];
+    }
   },
 
   /**
@@ -103,6 +111,8 @@ const experiment = <T = void>(name: string, environment?: T) => ({
     switch (code.op) {
       case "literal":
         return code.value;
+      case "array":
+        return code.values.map(elt => this.evalCode(elt));
       case "%":
         return this.evalNum(code.left) % this.evalNum(code.right);
       case "-":
@@ -239,7 +249,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    *
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  zeroToOne(salt: string | number): number {
+  zeroToOne(salt: SaltType): number {
     return this.hash(salt) / 0xfffffffffffff;
   },
 
@@ -252,7 +262,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param maxVal Maximum value to return
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  randomInteger(minVal: number, maxVal: number, salt: string | number): number {
+  randomInteger(minVal: number, maxVal: number, salt: SaltType): number {
     return minVal + (this.hash(salt) % (maxVal - minVal + 1));
   },
 
@@ -265,7 +275,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param maxVal Maximum value to return
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  randomFloat(minVal: number, maxVal: number, salt: string | number): number {
+  randomFloat(minVal: number, maxVal: number, salt: SaltType): number {
     return minVal + this.zeroToOne(salt) * (maxVal - minVal);
   },
 
@@ -277,7 +287,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param choices Available options
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  uniformChoice<U>(choices: U[], salt: string | number): U {
+  uniformChoice<U>(choices: U[], salt: SaltType): U {
     if (choices.length === 0)
       throw new Error("Must provide a non-empty choices list");
     const index = this.randomInteger(0, choices.length - 1, salt);
@@ -293,7 +303,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param weights Weight values for each option
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  weightedChoice<U>(choices: U[], weights: number[], salt: string | number): U {
+  weightedChoice<U>(choices: U[], weights: number[], salt: SaltType): U {
     let len = choices.length;
     if (len === 0) throw new Error("Must provide a non-empty choices list");
     if (weights.length !== len)
@@ -322,13 +332,13 @@ const experiment = <T = void>(name: string, environment?: T) => ({
   sample<U>(
     choices: U[],
     numDraws: number = choices.length,
-    salt: string | number
+    salt: SaltType
   ): U[] {
     const array = [...choices];
     const len = array.length;
     const stoppingPoint = Math.max(0, len - numDraws);
     for (let i = len - 1; i > stoppingPoint; i--) {
-      const j = this.randomInteger(0, i - 1, [salt, i].join("."));
+      const j = this.randomInteger(0, i - 1, [salt, i]);
 
       const temp = array[i];
       array[i] = array[j];
@@ -346,7 +356,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param p Probably of including any given element
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  bernoulliFilter<U>(choices: U[], p: number, salt: string | number): U[] {
+  bernoulliFilter<U>(choices: U[], p: number, salt: SaltType): U[] {
     if (p < 0 || p > 1) {
       throw new Error("Invalid probability");
     }
@@ -354,7 +364,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
       throw new Error("Choices must not be empty!");
     }
     return choices.filter(
-      (v, index) => experiment(name).zeroToOne([salt, index].join(".")) < p
+      (v, index) => experiment(name).zeroToOne([salt, index]) < p
     );
   },
 
@@ -366,7 +376,7 @@ const experiment = <T = void>(name: string, environment?: T) => ({
    * @param p Probably of yielding a 1
    * @param salt Used to get different values from multiple calls to the same experiment
    */
-  bernoulliTrial(p: number, salt: string | number): number {
+  bernoulliTrial(p: number, salt: SaltType): number {
     if (p < 0 || p > 1) {
       throw new Error("Invalid probability");
     }

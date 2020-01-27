@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "yarn build:js && yarn build:docs",
+    "build": "yarn build:js && yarn build:compiler && yarn build:docs",
+    "build:compiler": "jison src/planout.jison -o src/parser.js -m commonjs",
     "build:js": "tsc",
     "build:docs": "sphinx-build docs docs/_build/html",
     "test": "jest && tsc --noEmit"
@@ -26,6 +27,7 @@
     "babel-jest": "^25.1.0",
     "jest": "^25.1.0",
     "jest-fuzz": "^0.0.1",
+    "jison": "^0.4.18",
     "jsdoc": "^3.6.3",
     "jsdoc-to-markdown": "^5.0.3",
     "prettier": "^1.19.1",

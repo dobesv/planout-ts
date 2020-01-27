@@ -1,4 +1,5 @@
 import experiment from "../src/experiment";
+import { compile } from "../src";
 
 describe("experiment", () => {
   const generateChoices = () => {
@@ -17,7 +18,7 @@ describe("experiment", () => {
       ],
       Date.now()
     );
-    const choices = [];
+    const choices: Array<string | number> = [];
     for (let i = 0; i < count; i++) {
       const v = generator(i);
       if (!choices.includes(v)) {
@@ -41,7 +42,7 @@ describe("experiment", () => {
       }
     });
     test("does not repeat", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       for (let i = 0; i < 1000; i++) {
         const hash = exp.hash(String(i));
         found[hash] = true;
@@ -62,7 +63,7 @@ describe("experiment", () => {
       }
     });
     test("does not repeat", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       for (let i = 0; i < 1000; i++) {
         const hash = String(exp.zeroToOne(String(i)));
         found[hash] = true;
@@ -85,7 +86,7 @@ describe("experiment", () => {
       }
     });
     test("does not repeat", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       const count = 10;
       for (let i = 0; i < count; i++) {
         const hash = String(exp.randomInteger(0, 10000, String(i)));
@@ -111,7 +112,7 @@ describe("experiment", () => {
       }
     });
     test("returns a different value each time (in general)", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       const count = 5;
       for (let i = 0; i < count; i++) {
         const hash = String(exp.randomInteger(-1000, 1000, String(i)));
@@ -133,7 +134,7 @@ describe("experiment", () => {
       }
     });
     test("does not repeat", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       for (let i = 0; i < 10; i++) {
         const hash = String(exp.randomFloat(0, 1000, String(i)));
         found[hash] = true;
@@ -158,7 +159,7 @@ describe("experiment", () => {
       }
     });
     test("does not repeat", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       const count = 10;
       for (let i = 0; i < count; i++) {
         const hash = String(exp.randomFloat(-1000, 1000, String(i)));
@@ -178,7 +179,7 @@ describe("experiment", () => {
       }
     });
     test("eventually returns every element", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       for (let i = 0; i < choices.length * 10; i++) {
         const choice = String(exp.uniformChoice(choices, String(i)));
         found[choice] = true;
@@ -186,7 +187,7 @@ describe("experiment", () => {
       expect(Object.keys(found)).toHaveLength(choices.length);
     });
     test("returns elements in uniform frequency", () => {
-      const found = {};
+      const found: { [k: string]: number } = {};
       const count = choices.length * 1000;
       for (let i = 0; i < count; i++) {
         const choice = String(exp.uniformChoice(choices, String(i)));
@@ -213,7 +214,7 @@ describe("experiment", () => {
       }
     });
     test("eventually returns every element", () => {
-      const found = {};
+      const found: { [k: string]: boolean } = {};
       for (let i = 0; i < choices.length * 100; i++) {
         const choice = String(exp.weightedChoice(choices, weights, String(i)));
         found[choice] = true;
@@ -221,7 +222,7 @@ describe("experiment", () => {
       expect(Object.keys(found)).toHaveLength(choices.length);
     });
     test("returns elements in frequency similar to their weight", () => {
-      const found = {};
+      const found: { [k: string]: number } = {};
       const count = choices.length * 1000;
       for (let i = 0; i < count; i++) {
         const choice = String(exp.weightedChoice(choices, weights, String(i)));
@@ -270,8 +271,8 @@ describe("experiment", () => {
       expect(samples).toHaveLength(choices.length);
     });
     test("returns a variety of permutations of the input", () => {
-      const found = {};
-      for (let i = 0; i < choices.length * 1000; i++) {
+      const found: { [k: string]: number } = {};
+      for (let i = 0; i < choices.length * 500; i++) {
         const numDraws = exp.randomInteger(
           1,
           choices.length,
@@ -297,7 +298,7 @@ describe("experiment", () => {
       }
     });
     test("returns a variety of permutations of the input", () => {
-      const found = {};
+      const found: { [k: string]: number } = {};
       for (let i = 0; i < choices.length * 100; i++) {
         const p = exp.zeroToOne(String(choices.length));
         const samples = exp.bernoulliFilter(choices, p, String(i));
@@ -335,6 +336,56 @@ describe("experiment", () => {
           expect(counts[0] / iterations).toBeCloseTo(1 - p, 1);
         }
       }
+    });
+  });
+  describe("get", () => {
+    const exp = experiment("get", { foo: "bar", n: null });
+    test("gets a value", () => expect(exp.get("foo", "def")).toBe("bar"));
+    test("uses default if no value", () =>
+      expect(exp.get("non-existant", "def")).toBe("def"));
+    test("uses a default if value null", () =>
+      expect(exp.get("n", "def")).toBe("def"));
+  });
+  describe("evalCode", () => {
+    test("Allows setting a variable", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(compile("out = 1;"));
+      expect(exp.get("out", 0)).toBe(1);
+    });
+    test("Allows setting a variable from another variable", () => {
+      const exp = experiment("evalCode", {
+        anInt: 1
+      });
+      exp.evalCode(compile("out = anInt;"));
+      expect(exp.get("out", 0)).toBe(1);
+    });
+    test("Marks experiment disabled if script returns false", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(compile("return false;"));
+      expect(exp.enabled).toBe(false);
+      expect(exp.hash(0)).toBe(0);
+    });
+    test("Supports return true", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(compile("return true;\nreturn false;"));
+      expect(exp.enabled).toBe(true);
+    });
+    test("Supports uniformChoice", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(
+        compile(`
+          a = uniformChoice(choices=['a', 'b'], unit=1);
+          b = uniformChoice(choices=['aaa', 'bbb'], unit=4);
+        `)
+      );
+      expect(exp.get("a", "")).toBe("a");
+      expect(exp.get("b", "")).toBe("bbb");
+    });
+    test("Supports conditionals", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(compile("if(1 == 0) { a = 1; } else { a = 2; } b = 3;"));
+      expect(exp.get("a", "")).toBe(2);
+      expect(exp.get("b", "")).toBe(3);
     });
   });
 });
