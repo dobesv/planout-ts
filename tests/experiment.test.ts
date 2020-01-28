@@ -381,6 +381,17 @@ describe("experiment", () => {
       expect(exp.get("a", "")).toBe("a");
       expect(exp.get("b", "")).toBe("bbb");
     });
+    test("Supports weightedChoice", () => {
+      const exp = experiment("evalCode");
+      exp.evalCode(
+        compile(`
+          a = weightedChoice(choices=['a', 'b'], weights=[1,5], unit=111);
+          b = weightedChoice(choices=['aaa', 'bbb'], weights=[2,1], unit=4);
+        `)
+      );
+      expect(exp.get("a", "")).toBe("a");
+      expect(exp.get("b", "")).toBe("aaa");
+    });
     test("Supports conditionals", () => {
       const exp = experiment("evalCode");
       exp.evalCode(compile("if(1 == 0) { a = 1; } else { a = 2; } b = 3;"));

@@ -46,7 +46,7 @@ export interface PlanOutCodeUnaryOp {
 
 export interface PlanOutCodeCommutativeOp {
   op: "min" | "max" | "product" | "sum";
-  values: PlanOutCode[];
+  values: PlanOutCode;
 }
 
 // These values can be written straight into the PlanOut compiled code, but
@@ -70,20 +70,20 @@ export interface PlanOutCodeRandomTrialOp {
 export interface PlanOutCodeRandomFilterOp {
   op: "bernoulliFilter";
   p: PlanOutCode;
-  choices: PlanOutCode[];
+  choices: PlanOutCode;
 }
 export interface PlanOutCodeUniformChoiceOp {
   op: "uniformChoice";
-  choices: PlanOutCode[];
+  choices: PlanOutCode;
 }
 export interface PlanOutCodeWeightedChoiceOp {
   op: "weightedChoice";
-  choices: PlanOutCode[];
-  weights: PlanOutCode[];
+  choices: PlanOutCode;
+  weights: PlanOutCode;
 }
 export interface PlanOutCodeSampleOp {
   op: "sample";
-  choices: PlanOutCode[];
+  choices: PlanOutCode;
   draws: PlanOutCode;
 }
 export type PlanOutCodeRandomOp = { unit: PlanOutCode } & (

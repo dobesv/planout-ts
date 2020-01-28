@@ -135,7 +135,7 @@ export class PlanOutExperiment {
         return this.evalBool(code.left) || this.evalBool(code.right);
       case "bernoulliFilter":
         return this.bernoulliFilter(
-          code.choices.map(choice => this.evalCode(choice)),
+          this.evalArray(code.choices),
           this.evalNum(code.p),
           this.evalString(code.unit)
         );
@@ -192,7 +192,7 @@ export class PlanOutExperiment {
         return Math.round(this.evalNum(code.value));
       case "sample":
         return this.sample(
-          code.choices.map(choice => this.evalCode(choice)),
+          this.evalArray(code.choices),
           this.evalNum(code.draws),
           this.evalCode(code.unit)
         );
@@ -202,14 +202,15 @@ export class PlanOutExperiment {
         this.set(code.var, this.evalCode(code.value));
         return null;
       case "uniformChoice":
+        console.log(code);
         return this.uniformChoice(
-          code.choices.map(choice => this.evalCode(choice)),
+          this.evalArray(code.choices),
           this.evalString(code.unit)
         );
       case "weightedChoice":
         return this.weightedChoice(
-          code.choices.map(choice => this.evalCode(choice)),
-          code.weights.map(w => this.evalNum(w)),
+          this.evalArray(code.choices),
+          this.evalNumArray(code.weights),
           this.evalString(code.unit)
         );
     }
@@ -228,7 +229,7 @@ export class PlanOutExperiment {
     return !!result;
   }
 
-  evalArray(code: PlanOutCode): unknown[] {
+  evalArray(code: PlanOutCode): PlanOutCodeValue[] {
     const result = this.evalCode(code);
     if (!Array.isArray(result)) {
       throw new Error("Expected array operand");
@@ -236,8 +237,11 @@ export class PlanOutExperiment {
     return result;
   }
 
-  evalNumArray(values: PlanOutCode[]) {
-    return values.map((elt: PlanOutCode) => this.evalNum(elt));
+  evalNumArray(values: PlanOutCode) {
+    const ary = this.evalArray(values);
+    if (!ary.every(n => typeof n === "number"))
+      throw new Error("Expected an array of only numbers");
+    return ary as number[];
   }
 
   evalString(code: PlanOutCode): string {
