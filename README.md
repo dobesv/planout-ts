@@ -84,12 +84,12 @@ Part of PlanOut is the PlanOut language.  You can read about the language here:
 * https://facebook.github.io/planout/docs/planout-language.html
 
 To use PlanOut scripts with this package, you must compile them to JSON, parse the
-JSON to objects, and pass it to `evalCode`.  Provide an initial variable state
-(especially anything you want to use as a `salt`, which is called the `unit` in
-the scripting language) as an object last parameter to the experiment call.
+JSON to objects, and pass it to `execute`.  Provide an initial variable state
+(especially anything you want to use as a `salt`, which is called `unit` in
+the scripting language operations).
 
 The script will assign any experiment variables / parameters and you can read
-the calculated values by calling `get` on the experiment.
+the calculated values by calling `get` on the experiment that is returned.
 
 The idea behind the planout scripts is that you can make the system a bit more
 abstract - the "knobs and levers" are the variables set by the PlanOut language

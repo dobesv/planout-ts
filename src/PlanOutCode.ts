@@ -1,10 +1,10 @@
 export interface PlanOutCodeObjectLiteral {
-  [k: string]: PlanOutCodeValue | PlanOutCodeObjectLiteral | undefined;
+  [k: string]: PlanOutCodeValue | undefined;
 }
 
 export interface PlanOutCodeLiteralOp {
   op: "literal";
-  value: PlanOutCodeValue | PlanOutCodeObjectLiteral;
+  value: PlanOutCodeObjectLiteral;
 }
 
 export interface PlanOutCodeArrayOp {
@@ -34,19 +34,19 @@ export interface PlanOutCodeCondOp {
 }
 
 export interface PlanOutCodeBinaryOp {
-  op: "equals" | "and" | "or" | ">" | "<" | ">=" | "<=" | "%" | "/";
+  op: "equals" | ">" | "<" | ">=" | "<=" | "%" | "/" | "-";
   left: PlanOutCode;
   right: PlanOutCode;
 }
 
 export interface PlanOutCodeUnaryOp {
-  op: "return" | "not" | "round" | "-" | "length";
+  op: "return" | "negative" | "not" | "round" | "length";
   value: PlanOutCode;
 }
 
 export interface PlanOutCodeCommutativeOp {
-  op: "min" | "max" | "product" | "sum";
-  values: PlanOutCode;
+  op: "min" | "max" | "product" | "sum" | "and" | "or";
+  values: PlanOutCode[];
 }
 
 // These values can be written straight into the PlanOut compiled code, but
@@ -62,38 +62,44 @@ export interface PlanOutCodeRandomRangeOp {
   op: "randomFloat" | "randomInteger";
   min: PlanOutCode;
   max: PlanOutCode;
+  unit: PlanOutCode;
 }
 export interface PlanOutCodeRandomTrialOp {
   op: "bernoulliTrial";
   p: PlanOutCode;
+  unit: PlanOutCode;
 }
 export interface PlanOutCodeRandomFilterOp {
   op: "bernoulliFilter";
   p: PlanOutCode;
   choices: PlanOutCode;
+  unit: PlanOutCode;
 }
 export interface PlanOutCodeUniformChoiceOp {
   op: "uniformChoice";
   choices: PlanOutCode;
+  unit: PlanOutCode;
 }
 export interface PlanOutCodeWeightedChoiceOp {
   op: "weightedChoice";
   choices: PlanOutCode;
   weights: PlanOutCode;
+  unit: PlanOutCode;
 }
 export interface PlanOutCodeSampleOp {
   op: "sample";
   choices: PlanOutCode;
   draws: PlanOutCode;
+  unit: PlanOutCode;
 }
-export type PlanOutCodeRandomOp = { unit: PlanOutCode } & (
+export type PlanOutCodeRandomOp =
   | PlanOutCodeRandomRangeOp
   | PlanOutCodeRandomTrialOp
   | PlanOutCodeRandomFilterOp
   | PlanOutCodeUniformChoiceOp
   | PlanOutCodeWeightedChoiceOp
-  | PlanOutCodeSampleOp
-);
+  | PlanOutCodeSampleOp;
+
 export type PlanOutCodeCoreOp =
   | PlanOutCodeGetOp
   | PlanOutCodeSetOp

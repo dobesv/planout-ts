@@ -1,6 +1,6 @@
 import sha1 from "sha1";
 import flattenDeep from "lodash/flattenDeep";
-import { PlanOutCode, PlanOutCodeValue } from "./PlanOutCode";
+import { PlanOutCodeValue } from "./PlanOutCode";
 import defaultTo from "lodash/defaultTo";
 
 export type SaltType = PlanOutCodeValue;
@@ -12,7 +12,7 @@ export class PlanOutExperiment {
 
   constructor(name: string, environment: EnvironmentType = {}) {
     this.name = name;
-    this.environment = environment;
+    this.environment = Object.create(environment);
   }
 
   /**
@@ -20,7 +20,6 @@ export class PlanOutExperiment {
    * is not disabled, the hash is also set to zero.
    */
   enabled: boolean = true;
-  returned: boolean = false;
 
   /**
    * A number between 0 and 0xFFFFFFFFFFFFF calculated from the experiment salt and optionally
@@ -47,7 +46,7 @@ export class PlanOutExperiment {
    * @param name Variable name
    * @param def Default value if the value could not be found
    */
-  get(name: string, def: PlanOutCodeValue): PlanOutCodeValue {
+  get(name: string, def: PlanOutCodeValue = null): PlanOutCodeValue {
     return defaultTo(this.environment[name], def);
   }
 
@@ -70,9 +69,7 @@ export class PlanOutExperiment {
    * @param name Variable name
    */
   del(name: string): void {
-    if (this.environment.hasOwnProperty(name)) {
-      delete this.environment[name];
-    }
+    this.environment[name] = undefined;
   }
 
   /**
@@ -80,172 +77,6 @@ export class PlanOutExperiment {
    */
   disable(): void {
     this.enabled = false;
-  }
-
-  /**
-   * Execute compiled PlanOut code.  This can be generated using their online compiler; see
-   *
-   * https://facebook.github.io/planout/docs/planout-language.html
-   * http://planout-editor.herokuapp.com/
-   *
-   * @param code PlanOut compiled code (parsed from JSON)
-   */
-  evalCode(code: PlanOutCode): PlanOutCodeValue {
-    // Literal values pass through unchanged
-    if (
-      typeof code === "number" ||
-      typeof code === "string" ||
-      typeof code === "boolean"
-    ) {
-      return code;
-    }
-    if (code === null) {
-      return null;
-    }
-
-    // If this.returned is set, stop evaluation
-    if (this.returned) {
-      return null;
-    }
-    if (Array.isArray(code)) {
-      return code.map(elt => this.evalCode(elt));
-    }
-    switch (code.op) {
-      case "literal":
-        return code.value;
-      case "array":
-        return code.values.map(elt => this.evalCode(elt));
-      case "%":
-        return this.evalNum(code.left) % this.evalNum(code.right);
-      case "-":
-        return -this.evalNum(code.value);
-      case "/":
-        return this.evalNum(code.left) / this.evalNum(code.right);
-      case "<":
-        return this.evalNum(code.left) < this.evalNum(code.right);
-      case "<=":
-        return this.evalNum(code.left) <= this.evalNum(code.right);
-      case ">":
-        return this.evalNum(code.left) > this.evalNum(code.right);
-      case ">=":
-        return this.evalNum(code.left) >= this.evalNum(code.right);
-      case "and":
-        return this.evalBool(code.left) && this.evalBool(code.right);
-      case "or":
-        return this.evalBool(code.left) || this.evalBool(code.right);
-      case "bernoulliFilter":
-        return this.bernoulliFilter(
-          this.evalArray(code.choices),
-          this.evalNum(code.p),
-          this.evalString(code.unit)
-        );
-      case "bernoulliTrial":
-        return this.bernoulliTrial(
-          this.evalNum(code.p),
-          this.evalString(code.unit)
-        );
-      case "cond":
-        for (const clause of code.cond) {
-          const predicate = this.evalBool(clause.if);
-          if (predicate) {
-            return this.evalCode(clause.then);
-          }
-        }
-        return null;
-      case "equals":
-        return this.evalCode(code.left) === this.evalCode(code.right);
-      case "get":
-        return this.get(code.var, null);
-      case "length":
-        return this.evalArray(code.value).length;
-      case "max":
-        return Math.max(...this.evalNumArray(code.values));
-      case "min":
-        return Math.min(...this.evalNumArray(code.values));
-      case "not":
-        return !this.evalBool(code.value);
-      case "product":
-        return this.evalNumArray(code.values).reduce((p: number, v: number) =>
-          typeof v === "number" ? p * v : p
-        );
-      case "sum":
-        return this.evalNumArray(code.values).reduce((p: number, v: number) =>
-          typeof v === "number" ? p + v : p
-        );
-      case "randomFloat":
-        return this.randomFloat(
-          this.evalNum(code.min),
-          this.evalNum(code.max),
-          this.evalString(code.unit)
-        );
-      case "randomInteger":
-        return this.randomInteger(
-          this.evalNum(code.min),
-          this.evalNum(code.max),
-          this.evalString(code.unit)
-        );
-      case "return":
-        this.returned = true;
-        this.enabled = this.evalBool(code.value);
-        break;
-      case "round":
-        return Math.round(this.evalNum(code.value));
-      case "sample":
-        return this.sample(
-          this.evalArray(code.choices),
-          this.evalNum(code.draws),
-          this.evalCode(code.unit)
-        );
-      case "seq":
-        return code.seq.map(elt => this.evalCode(elt));
-      case "set":
-        this.set(code.var, this.evalCode(code.value));
-        return null;
-      case "uniformChoice":
-        console.log(code);
-        return this.uniformChoice(
-          this.evalArray(code.choices),
-          this.evalString(code.unit)
-        );
-      case "weightedChoice":
-        return this.weightedChoice(
-          this.evalArray(code.choices),
-          this.evalNumArray(code.weights),
-          this.evalString(code.unit)
-        );
-    }
-  }
-
-  evalNum(code: PlanOutCode): number {
-    const result = this.evalCode(code);
-    if (typeof result !== "number") {
-      throw new Error("Invalid operand");
-    }
-    return result;
-  }
-
-  evalBool(code: PlanOutCode): boolean {
-    const result = this.evalCode(code);
-    return !!result;
-  }
-
-  evalArray(code: PlanOutCode): PlanOutCodeValue[] {
-    const result = this.evalCode(code);
-    if (!Array.isArray(result)) {
-      throw new Error("Expected array operand");
-    }
-    return result;
-  }
-
-  evalNumArray(values: PlanOutCode) {
-    const ary = this.evalArray(values);
-    if (!ary.every(n => typeof n === "number"))
-      throw new Error("Expected an array of only numbers");
-    return ary as number[];
-  }
-
-  evalString(code: PlanOutCode): string {
-    return String(this.evalCode(code));
   }
 
   /**

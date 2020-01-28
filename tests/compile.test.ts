@@ -1,4 +1,4 @@
-import { compile } from "../../src";
+import { compile } from "../src";
 
 describe("compile", () => {
   test("compiles sample test", () => {

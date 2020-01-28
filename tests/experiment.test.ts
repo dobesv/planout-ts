@@ -346,57 +346,5 @@ describe("experiment", () => {
     test("uses a default if value null", () =>
       expect(exp.get("n", "def")).toBe("def"));
   });
-  describe("evalCode", () => {
-    test("Allows setting a variable", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(compile("out = 1;"));
-      expect(exp.get("out", 0)).toBe(1);
-    });
-    test("Allows setting a variable from another variable", () => {
-      const exp = experiment("evalCode", {
-        anInt: 1
-      });
-      exp.evalCode(compile("out = anInt;"));
-      expect(exp.get("out", 0)).toBe(1);
-    });
-    test("Marks experiment disabled if script returns false", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(compile("return false;"));
-      expect(exp.enabled).toBe(false);
-      expect(exp.hash(0)).toBe(0);
-    });
-    test("Supports return true", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(compile("return true;\nreturn false;"));
-      expect(exp.enabled).toBe(true);
-    });
-    test("Supports uniformChoice", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(
-        compile(`
-          a = uniformChoice(choices=['a', 'b'], unit=1);
-          b = uniformChoice(choices=['aaa', 'bbb'], unit=4);
-        `)
-      );
-      expect(exp.get("a", "")).toBe("a");
-      expect(exp.get("b", "")).toBe("bbb");
-    });
-    test("Supports weightedChoice", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(
-        compile(`
-          a = weightedChoice(choices=['a', 'b'], weights=[1,5], unit=111);
-          b = weightedChoice(choices=['aaa', 'bbb'], weights=[2,1], unit=4);
-        `)
-      );
-      expect(exp.get("a", "")).toBe("a");
-      expect(exp.get("b", "")).toBe("aaa");
-    });
-    test("Supports conditionals", () => {
-      const exp = experiment("evalCode");
-      exp.evalCode(compile("if(1 == 0) { a = 1; } else { a = 2; } b = 3;"));
-      expect(exp.get("a", "")).toBe(2);
-      expect(exp.get("b", "")).toBe(3);
-    });
-  });
+
 });
