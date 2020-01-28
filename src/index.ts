@@ -4,4 +4,6 @@ export * from "./PlanOutInterpreter";
 import experiment from "./experiment";
 import { parse as compile } from "./parser";
 import execute from "./execute";
-export { compile, execute, experiment };
+import inspect from "./inspect";
+
+export { compile, execute, experiment, inspect };
