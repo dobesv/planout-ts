@@ -1,18 +1,21 @@
 {
   "name": "planout-ts",
   "version": "0.0.1",
-  "description": "",
+  "description": "TypeScript/JavaScript implementation of PlanOut experimentation system",
   "main": "dist/index.js",
   "scripts": {
-    "build": "yarn build:js && yarn build:compiler && yarn build:docs",
+    "build": "yarn build:compiler && yarn build:js && yarn build:docs",
     "build:compiler": "jison src/planout.jison -o src/parser.js -m commonjs",
-    "build:js": "tsc",
+    "build:js": "cp src/*.js src/*.d.ts dist/ && tsc",
     "build:docs": "sphinx-build docs docs/_build/html",
+    "prepublish": "yarn build",
     "test": "jest && tsc --noEmit"
   },
+  "types": "dist/index.d.ts",
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Dobes Vandermeer <dobesv@gmail.com>",
+  "sideEffects": false,
+  "license": "MIT",
   "dependencies": {
     "@types/jest": "^24.9.1",
     "lodash": "^4.17.15",

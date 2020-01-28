@@ -1,6 +1,9 @@
 {
   "include": ["src/**.ts"],
+  "exclude": ["dist", "docs", "node_modules"],
   "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
     "esModuleInterop": true,
     "module": "CommonJS",
     "noFallthroughCasesInSwitch": true,

@@ -3,6 +3,5 @@ src
 docs
 babel.config.js
 renovate.json
-tsconfig.json
 yarn.lock
 package-lock.json

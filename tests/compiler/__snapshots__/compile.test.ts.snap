@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`compile compiles sample test 1`] = `
+Object {
+  "op": "seq",
+  "seq": Array [
+    Object {
+      "op": "set",
+      "value": Object {
+        "choices": Object {
+          "op": "array",
+          "values": Array [
+            1,
+            10,
+          ],
+        },
+        "op": "uniformChoice",
+        "unit": Object {
+          "op": "get",
+          "var": "userid",
+        },
+      },
+      "var": "group_size",
+    },
+    Object {
+      "op": "set",
+      "value": Object {
+        "op": "bernoulliTrial",
+        "p": 0.8,
+        "unit": Object {
+          "op": "get",
+          "var": "userid",
+        },
+      },
+      "var": "specific_goal",
+    },
+    Object {
+      "cond": Array [
+        Object {
+          "if": Object {
+            "op": "get",
+            "var": "specific_goal",
+          },
+          "then": Object {
+            "op": "seq",
+            "seq": Array [
+              Object {
+                "op": "set",
+                "value": Object {
+                  "choices": Object {
+                    "op": "array",
+                    "values": Array [
+                      8,
+                      16,
+                      32,
+                      64,
+                    ],
+                  },
+                  "op": "uniformChoice",
+                  "unit": Object {
+                    "op": "get",
+                    "var": "userid",
+                  },
+                },
+                "var": "ratings_per_user_goal",
+              },
+              Object {
+                "op": "set",
+                "value": Object {
+                  "op": "product",
+                  "values": Array [
+                    Object {
+                      "op": "get",
+                      "var": "group_size",
+                    },
+                    Object {
+                      "op": "get",
+                      "var": "ratings_per_user_goal",
+                    },
+                  ],
+                },
+                "var": "ratings_goal",
+              },
+            ],
+          },
+        },
+      ],
+      "op": "cond",
+    },
+  ],
+}
+`;
