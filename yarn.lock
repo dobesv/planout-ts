@@ -3035,10 +3035,9 @@ jison-lex@0.3.x:
     lex-parser "0.1.x"
     nomnom "1.5.2"
 
-jison@^0.4.18:
-  version "0.4.18"
-  resolved "https://registry.yarnpkg.com/jison/-/jison-0.4.18.tgz#c68a6a54bfe7028fa40bcfc6cc8bbd9ed291f502"
-  integrity sha512-FKkCiJvozgC7VTHhMJ00a0/IApSxhlGsFIshLW6trWJ8ONX2TQJBBz6DlcO1Gffy4w9LT+uL+PA+CVnUSJMF7w==
+"jison@https://github.com/deathcap/jison.git#modulemain":
+  version "0.4.15"
+  resolved "https://github.com/deathcap/jison.git#83a38136e958c32de16630099946ebe0357ea605"
   dependencies:
     JSONSelect "0.4.0"
     cjson "0.3.0"
