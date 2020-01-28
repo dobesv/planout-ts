@@ -5,7 +5,7 @@ import { PlanOutInterpreter } from "./PlanOutInterpreter";
 const execute = (
   name: string,
   code: PlanOutCode,
-  input?: EnvironmentType
+  input: EnvironmentType = null
 ): PlanOutExperiment => {
   const experiment = new PlanOutExperiment(name, input);
   const interpreter = new PlanOutInterpreter(experiment);

@@ -10,7 +10,7 @@ export class PlanOutExperiment {
   name: string;
   environment: EnvironmentType;
 
-  constructor(name: string, environment: EnvironmentType = {}) {
+  constructor(name: string, environment: EnvironmentType = null) {
     this.name = name;
     this.environment = Object.create(environment);
   }
