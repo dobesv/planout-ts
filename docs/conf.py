@@ -176,7 +176,7 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
-js_source_path = os.path.join(project_root, 'src')
+js_source_path = '../src'
 js_language = 'typescript'
 
 if not os.path.exists(os.path.join(project_root, "node_modules")):
