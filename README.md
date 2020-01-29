@@ -42,6 +42,7 @@ Here's a rough example:
 
 ```typescript
 import { experiment } from 'planout-ts';
+import React from 'react';
 
 // Get previous client id or generate a new one
 const clientId = localStorage.clientId || (localStorage.clientId = [Date.now(), Math.floor(Math.random()*0xFFFFFFFF)].join('.'));
@@ -107,6 +108,41 @@ about the current user (if there is one) as part of the experiment input
 variables, loads and runs compiled PlanOut scripts from the database, and 
 then updates the user experience according to the variables set by the 
 experiment scripts.
+
+Here's a rough example using a script:
+
+```typescript
+import { compile, execute } from 'planout-ts';
+import React from 'react';
+
+// Get previous client id or generate a new one
+const clientId = localStorage.clientId || (localStorage.clientId = [Date.now(), Math.floor(Math.random()*0xFFFFFFFF)].join('.'));
+
+// Get the experiment code somehow, typically you would want to pre-compile this
+// and ship it in the HTML page so it is available immediately to the code that
+// depends on it
+const code = compile(`variant = uniformChoice(choices=['A', 'B'], unit=clientId);`);
+
+// Imaginary React component that uses this
+class LoginControl extends React.Component {
+  experiment = execute('login', code, { clientId });
+
+  componentDidMount() {
+    // Example of logging the event to Google Analytics
+    if(this.experiment.enabled) {
+      ga('send', 'event', 'experiments', 'Login Page Loaded', this.experiment.getParamsText());
+    }        
+  }
+
+  render() {    
+    if(this.experiment.get('variant') === 'B') {
+      // show B version
+    } else {
+      // show A / default version
+    }  
+  }
+}
+```
 
 #### Disabling experiments in the script
 

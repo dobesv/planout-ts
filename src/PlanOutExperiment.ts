@@ -68,6 +68,19 @@ export class PlanOutExperiment {
   }
 
   /**
+   * Get a human-readable string with all defined parameters.  This
+   * doesn't include the inputs normally, and can be used to describe
+   * the current variant of this experiment if you all the parameters
+   * of interest are being set in the environment.
+   */
+  getParamsText(): string {
+    return Object.entries(this.environment)
+      .map(p => p.join(":"))
+      .sort()
+      .join(" ");
+  }
+
+  /**
    * Remove a variable from the environment.
    *
    * @param name Variable name
