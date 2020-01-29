@@ -108,6 +108,18 @@ variables, loads and runs compiled PlanOut scripts from the database, and
 then updates the user experience according to the variables set by the 
 experiment scripts.
 
+#### Disabling experiments in the script
+
+Note that if the experiment has a `return false;` then the experiment will
+be marked as disabled.  In this case, the application should not use any
+values set by the script in the experiment and should not log the experiment
+exposure to analytics.
+
+When disabled, the experiment `get` will always return the default argument
+provided (`null` by default) and the random selection methods will always
+return zero, the first item, or the minimum value rather than applying the
+hash function.
+
 ### API Documentation
 
 There's API documentation describing all the generator functions available here:

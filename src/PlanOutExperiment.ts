@@ -1,9 +1,9 @@
 import sha1 from "sha1";
 import flattenDeep from "lodash/flattenDeep";
-import { PlanOutCodeValue } from "./PlanOutCode";
+import { PlanOutCodeAtomicValue, PlanOutCodeValue } from "./PlanOutCode";
 import defaultTo from "lodash/defaultTo";
 
-export type SaltType = PlanOutCodeValue;
+export type SaltType = PlanOutCodeAtomicValue | SaltType[];
 export type EnvironmentType = { [k: string]: PlanOutCodeValue | undefined };
 
 export class PlanOutExperiment {
@@ -41,12 +41,16 @@ export class PlanOutExperiment {
   /**
    * Get a value from the environment.
    *
-   * Typically these will have been set by a planout script
+   * Typically these will have been set by a planout script.
+   *
+   * Note that if the experiment is disabled, this will always return
+   * the default value.
    *
    * @param name Variable name
    * @param def Default value if the value could not be found
    */
   get(name: string, def: PlanOutCodeValue = null): PlanOutCodeValue {
+    if (!this.enabled) return def;
     return defaultTo(this.environment[name], def);
   }
 
