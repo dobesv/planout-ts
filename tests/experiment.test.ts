@@ -95,6 +95,19 @@ describe("experiment", () => {
       expect(Object.keys(found)).toHaveLength(count);
     });
   });
+  describe("randomInteger(3, 7)", () => {
+    const exp = experiment("randomInteger");
+    test("is not less than 3", () => {
+      for (let i = 0; i < 100; i++) {
+        expect(exp.randomInteger(3, 7, String(i))).toBeGreaterThanOrEqual(3);
+      }
+    });
+    test("is not greater than 7", () => {
+      for (let i = 0; i < 100; i++) {
+        expect(exp.randomInteger(3, 7, String(i))).toBeLessThanOrEqual(7);
+      }
+    });
+  });
   describe("randomInteger(-1000, 1000)", () => {
     const exp = experiment("randomInteger");
     test("is not less than -1000", () => {
@@ -346,5 +359,4 @@ describe("experiment", () => {
     test("uses a default if value null", () =>
       expect(exp.get("n", "def")).toBe("def"));
   });
-
 });
