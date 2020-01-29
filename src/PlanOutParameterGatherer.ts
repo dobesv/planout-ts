@@ -132,6 +132,74 @@ const binaryArithmeticCombinator = (
 };
 export type MetaEnvironment = { [k: string]: PlanOutParameter | undefined };
 
+const mergeParameters = (
+  left: PlanOutParameter,
+  right: PlanOutParameter
+): PlanOutParameter => {
+  if (left === null) {
+    return right;
+  }
+  if (right === null) {
+    return left;
+  }
+  // Merge individual values into a single select where possible
+  if (typeof left !== "object") {
+    if (typeof right !== "object") {
+      if (left === right) {
+        return left;
+      }
+      return { type: "select", limit: 1, values: [left, right] };
+    }
+    if (right.type === "select" && right.limit === 1) {
+      return { type: "select", limit: 1, values: [left, ...right.values] };
+    }
+  } else if (typeof right !== "object") {
+    if (left.type === "select" && left.limit === 1) {
+      return { type: "select", limit: 1, values: [...left.values, right] };
+    }
+  } else {
+    if (
+      (left.type === "float" || left.type === "integer") &&
+      left.type === right.type
+    ) {
+      return {
+        type: right.type,
+        min: Math.min(left.min, right.min),
+        max: Math.max(left.max, right.max)
+      };
+    }
+    if (
+      left.type === "select" &&
+      left.limit === 1 &&
+      right.type === "select" &&
+      right.limit === left.limit
+    ) {
+      return {
+        type: right.type,
+        limit: 1,
+        values: union(left.values, right.values)
+      };
+    }
+    if (left.type === "union") {
+      if (right.type === "union") {
+        return {
+          type: "union",
+          variants: [...left.variants, ...right.variants]
+        };
+      } else {
+        return {
+          type: "union",
+          variants: [...left.variants, right]
+        };
+      }
+    }
+  }
+  return {
+    type: "union",
+    variants: [left, right]
+  };
+};
+
 /**
  * Give an experiment and some code, calculate the range of values that
  * the script might have output.  This can be used to display a user
@@ -317,55 +385,10 @@ export class PlanOutParameterGatherer {
     if (parameter === null || parameter === undefined) return null;
 
     // Merge with existing assignment to same name, if there is any
-    const existingParameter = this.environment[code.var];
-    if (existingParameter) {
-      if (
-        typeof existingParameter === "object" &&
-        typeof parameter === "object" &&
-        (existingParameter.type === "float" ||
-          existingParameter.type === "integer") &&
-        existingParameter.type === parameter.type
-      ) {
-        parameter = {
-          type: parameter.type,
-          min: Math.min(existingParameter.min, parameter.min),
-          max: Math.max(existingParameter.max, parameter.max)
-        };
-      } else if (
-        typeof existingParameter === "object" &&
-        existingParameter.type === "select" &&
-        existingParameter.limit === 1 &&
-        typeof parameter === "object" &&
-        parameter.type === "select" &&
-        parameter.limit === existingParameter.limit
-      ) {
-        parameter = {
-          type: parameter.type,
-          limit: 1,
-          values: union(existingParameter.values, parameter.values)
-        };
-      } else if (
-        typeof existingParameter === "object" &&
-        existingParameter.type === "union"
-      ) {
-        if (typeof parameter === "object" && parameter.type === "union") {
-          parameter = {
-            type: "union",
-            variants: [...existingParameter.variants, ...parameter.variants]
-          };
-        } else {
-          parameter = {
-            type: "union",
-            variants: [...existingParameter.variants, parameter]
-          };
-        }
-      } else {
-        parameter = {
-          type: "union",
-          variants: [existingParameter, parameter]
-        };
-      }
-    }
+    parameter = mergeParameters(
+      defaultTo(this.environment[code.var], null),
+      parameter
+    );
     this.environment[code.var] = parameter;
     return parameter;
   }

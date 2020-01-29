@@ -1,5 +1,4 @@
 import experiment from "../src/experiment";
-import { compile } from "../src";
 
 describe("experiment", () => {
   const generateChoices = () => {

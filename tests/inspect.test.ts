@@ -75,7 +75,7 @@ describe("inspect", () => {
       b = 3;`)
       ).parameters
     ).toMatchObject({
-      a: { type: "union", variants: [1, 2] },
+      a: { type: "select", values: [1, 2] },
       b: 3,
       q: { type: "select", limit: 1, values: ["A", "B", "C", "D"] },
       r: { type: "select", limit: 1, values: [1, 2, 3, 4] },
