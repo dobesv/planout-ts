@@ -16,24 +16,24 @@
   "sideEffects": false,
   "license": "MIT",
   "dependencies": {
-    "@types/jest": "^24.9.1",
+    "@types/jest": "^25.0.0",
     "lodash": "^4.17.15",
     "sha1": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "@babel/preset-typescript": "^7.8.3",
-    "@types/lodash": "^4.14.149",
-    "@types/sha1": "^1.1.2",
-    "babel-jest": "^25.1.0",
-    "jest": "^25.1.0",
-    "jest-fuzz": "^0.0.1",
+    "@babel/core": "7.8.3",
+    "@babel/preset-env": "7.8.3",
+    "@babel/preset-typescript": "7.8.3",
+    "@types/lodash": "4.14.149",
+    "@types/sha1": "1.1.2",
+    "babel-jest": "25.1.0",
+    "jest": "25.1.0",
+    "jest-fuzz": "0.0.1",
     "jison": "https://github.com/deathcap/jison.git#modulemain",
-    "jsdoc": "^3.6.3",
-    "jsdoc-to-markdown": "^5.0.3",
-    "prettier": "^1.19.1",
-    "typedoc": "^0.16.9",
-    "typescript": "^3.7.5"
+    "jsdoc": "3.6.3",
+    "jsdoc-to-markdown": "5.0.3",
+    "prettier": "1.19.1",
+    "typedoc": "0.16.9",
+    "typescript": "3.7.5"
   }
 }
