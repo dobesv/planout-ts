@@ -111,7 +111,6 @@ export type PlanOutCodeCoreOp =
   | PlanOutCodeUnaryOp
   | PlanOutCodeCommutativeOp;
 
-export type PlanOutCode =
-  | PlanOutCodeAtomicValue
-  | PlanOutCodeCoreOp
-  | PlanOutCodeRandomOp;
+export type PlanOutCodeOp = PlanOutCodeCoreOp | PlanOutCodeRandomOp;
+
+export type PlanOutCode = PlanOutCodeAtomicValue | PlanOutCodeOp;

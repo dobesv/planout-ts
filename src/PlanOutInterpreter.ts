@@ -1,4 +1,4 @@
-import { PlanOutExperiment } from "./PlanOutExperiment";
+import { PlanOutExperiment, SaltType } from "./PlanOutExperiment";
 import {
   PlanOutCode,
   PlanOutCodeArrayOp,
@@ -7,6 +7,7 @@ import {
   PlanOutCodeCondOp,
   PlanOutCodeGetOp,
   PlanOutCodeLiteralOp,
+  PlanOutCodeOp,
   PlanOutCodeRandomFilterOp,
   PlanOutCodeRandomRangeOp,
   PlanOutCodeRandomTrialOp,
@@ -35,7 +36,7 @@ export class PlanOutInterpreter {
     if (this.returned) {
       return null;
     }
-    if (code === null) {
+    if (code === null || code === undefined) {
       return null;
     }
     if (
@@ -52,10 +53,17 @@ export class PlanOutInterpreter {
     return impl.call(this, code);
   }
 
-  evalNum(code: PlanOutCode): number {
+  evalNumArg<T extends PlanOutCodeOp>(code: T, name: string & keyof T): number {
+    return this.evalNum(code.op, name, code[name] as any);
+  }
+
+  evalNum(op: string, param: string, code: PlanOutCode): number {
     const result = this.evalCode(code);
+    if (result instanceof Date) {
+      return +result;
+    }
     if (typeof result !== "number") {
-      throw new Error("Invalid operand");
+      throw new Error(`${op} ${param}: expected number but got ${result}`);
     }
     return result;
   }
@@ -65,23 +73,61 @@ export class PlanOutInterpreter {
     return !!result;
   }
 
-  evalArray(code: PlanOutCode): PlanOutCodeValue[] {
+  evalArray(op: string, name: string, code: PlanOutCode): PlanOutCodeValue[] {
     const result = this.evalCode(code);
     if (!Array.isArray(result)) {
-      throw new Error(`Expected array operand, got ${result}`);
+      throw new Error(`${op} ${name}: expected array, got ${result}`);
     }
     return result;
   }
 
-  evalNumArray(values: PlanOutCode) {
-    const ary = this.evalArray(values);
+  evalArrayArg<T extends PlanOutCodeOp>(
+    code: T,
+    name: string & keyof T
+  ): PlanOutCodeValue[] {
+    return this.evalArray(code.op, name, code[name] as any);
+  }
+
+  evalNumArray(op: string, name: string, values: PlanOutCode): number[] {
+    const ary = this.evalArray(op, name, values);
     if (!ary.every(n => typeof n === "number"))
-      throw new Error(`Expected an array of only numbers, got ${ary}`);
+      throw new Error(
+        `${op} ${name}: expected an array of only numbers, got ${ary}`
+      );
     return ary as number[];
+  }
+
+  evalNumArrayArg<T extends PlanOutCodeOp>(
+    code: T,
+    name: string & keyof T
+  ): number[] {
+    return this.evalNumArray(code.op, name, code[name] as any);
   }
 
   evalString(code: PlanOutCode): string {
     return String(this.evalCode(code));
+  }
+
+  evalSalt(op: string, name: string, code: PlanOutCode): SaltType {
+    const val = this.evalCode(code);
+    const validateSalt = (v: PlanOutCodeValue) => {
+      if (Array.isArray(v)) {
+        for (const elt of v) {
+          validateSalt(elt);
+        }
+        if (typeof val === "object") {
+          new Error(
+            `${op} ${name}: expected a string, boolean, number, or array, got ${val}`
+          );
+        }
+      }
+    };
+    validateSalt(val);
+    return val;
+  }
+
+  evalSaltArg<T extends PlanOutCodeOp>(code: T, name: string & keyof T) {
+    return this.evalSalt(code.op, name, code[name] as any);
   }
 
   literal(code: PlanOutCodeLiteralOp) {
@@ -92,56 +138,67 @@ export class PlanOutInterpreter {
     return code.values.map(value => this.evalCode(value));
   }
 
+  evalBinaryNumOp<T>(
+    code: PlanOutCodeBinaryOp,
+    fn: (a: number, b: number) => T
+  ): T {
+    return fn(this.evalNumArg(code, "left"), this.evalNumArg(code, "right"));
+  }
+
   "%"(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) % this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a % b);
   }
 
   "-"(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) - this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a - b);
   }
 
   "/"(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) / this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a / b);
   }
 
   "<"(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) < this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a < b);
   }
 
   "<="(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) <= this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a <= b);
   }
 
   ">"(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) > this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a > b);
   }
 
   ">="(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) >= this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a >= b);
   }
 
   negative(code: PlanOutCodeUnaryOp) {
-    return -this.evalNum(code.value);
+    return -this.evalNumArg(code, "value");
   }
 
   equals(code: PlanOutCodeBinaryOp) {
-    return this.evalNum(code.left) === this.evalNum(code.right);
+    return this.evalBinaryNumOp(code, (a, b) => a == b);
   }
 
-  and(code: PlanOutCodeCommutativeOp) {
+  evalLogicalCommutativeOp(
+    code: PlanOutCodeCommutativeOp,
+    fn: (a: boolean, b: boolean) => boolean
+  ) {
     return code.values
-      .map(arg => this.evalBool(arg))
-      .reduce((p: boolean, v: boolean) => p && v, true);
+      .map((arg, n) => this.evalBool(arg))
+      .reduce((p: boolean, v: boolean) => fn(p, v));
+  }
+  and(code: PlanOutCodeCommutativeOp) {
+    return this.evalLogicalCommutativeOp(code, (a, b) => a && b);
   }
 
   or(code: PlanOutCodeCommutativeOp) {
-    return code.values
-      .map(arg => this.evalBool(arg))
-      .reduce((p: boolean, v: boolean) => p || v, false);
+    return this.evalLogicalCommutativeOp(code, (a, b) => a || b);
   }
 
   length(code: PlanOutCodeUnaryOp) {
-    return this.evalArray(code.value).length;
+    return this.evalArrayArg(code, "value").length;
   }
 
   not(code: PlanOutCodeUnaryOp) {
@@ -149,22 +206,30 @@ export class PlanOutInterpreter {
   }
 
   max(code: PlanOutCodeCommutativeOp) {
-    return Math.max(...code.values.map(arg => this.evalNum(arg)));
+    return Math.max(
+      ...code.values.map((arg, n) =>
+        this.evalNum(code.op, `operand ${n + 1}`, arg)
+      )
+    );
   }
 
   min(code: PlanOutCodeCommutativeOp) {
-    return Math.min(...code.values.map(arg => this.evalNum(arg)));
+    return Math.min(
+      ...code.values.map((arg, n) =>
+        this.evalNum(code.op, `operand ${n + 1}`, arg)
+      )
+    );
   }
 
   product(code: PlanOutCodeCommutativeOp) {
     return code.values
-      .map(arg => this.evalNum(arg))
+      .map((arg, n) => this.evalNum(code.op, `operand ${n + 1}`, arg))
       .reduce((p: number, v: number) => (typeof v === "number" ? p * v : p));
   }
 
   sum(code: PlanOutCodeCommutativeOp) {
     return code.values
-      .map(arg => this.evalNum(arg))
+      .map((arg, n) => this.evalNum(code.op, `operand ${n + 1}`, arg))
       .reduce((p: number, v: number) => (typeof v === "number" ? p + v : p));
   }
 
@@ -225,60 +290,60 @@ export class PlanOutInterpreter {
   }
 
   round(code: PlanOutCodeUnaryOp) {
-    return Math.round(this.evalNum(code.value));
+    return Math.round(this.evalNumArg(code, "value"));
   }
 
   bernoulliFilter(code: PlanOutCodeRandomFilterOp) {
     return this.experiment.bernoulliFilter(
-      this.evalArray(code.choices),
-      this.evalNum(code.p),
-      this.evalString(code.unit)
+      this.evalArrayArg(code, "choices"),
+      this.evalNumArg(code, "p"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   bernoulliTrial(code: PlanOutCodeRandomTrialOp) {
     return this.experiment.bernoulliTrial(
-      this.evalNum(code.p),
-      this.evalString(code.unit)
+      this.evalNumArg(code, "p"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   randomFloat(code: PlanOutCodeRandomRangeOp) {
     return this.experiment.randomFloat(
-      this.evalNum(code.min),
-      this.evalNum(code.max),
-      this.evalString(code.unit)
+      this.evalNumArg(code, "min"),
+      this.evalNumArg(code, "max"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   randomInteger(code: PlanOutCodeRandomRangeOp) {
     return this.experiment.randomInteger(
-      this.evalNum(code.min),
-      this.evalNum(code.max),
-      this.evalString(code.unit)
+      this.evalNumArg(code, "min"),
+      this.evalNumArg(code, "max"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   sample(code: PlanOutCodeSampleOp) {
     return this.experiment.sample(
-      this.evalArray(code.choices),
-      this.evalNum(code.draws),
-      this.evalCode(code.unit)
+      this.evalArrayArg(code, "choices"),
+      this.evalNumArg(code, "draws"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   uniformChoice(code: PlanOutCodeUniformChoiceOp) {
     return this.experiment.uniformChoice(
-      this.evalArray(code.choices),
-      this.evalString(code.unit)
+      this.evalArrayArg(code, "choices"),
+      this.evalSaltArg(code, "unit")
     );
   }
 
   weightedChoice(code: PlanOutCodeWeightedChoiceOp) {
     return this.experiment.weightedChoice(
-      this.evalArray(code.choices),
-      this.evalNumArray(code.weights),
-      this.evalString(code.unit)
+      this.evalArrayArg(code, "choices"),
+      this.evalNumArrayArg(code, "weights"),
+      this.evalSaltArg(code, "unit")
     );
   }
 }
