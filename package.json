@@ -10,6 +10,11 @@
     "build:docs": "sphinx-build docs docs/_build/html",
     "test": "jest && tsc --noEmit"
   },
+  "homepage": "https://github.com/dobesv/planout-ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dobesv/planout-ts.git"
+  },
   "types": "dist/index.d.ts",
   "keywords": [],
   "author": "Dobes Vandermeer <dobesv@gmail.com>",
