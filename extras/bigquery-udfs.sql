@@ -85,7 +85,7 @@ FROM (
     FROM (
       SELECT
         e1.label AS `variant`,
-        COUNT(DISTINCT e1.anonymousId) AS `exposures`,
+        COUNT(e1.anonymousId) AS `exposures`,
         SUM(CASE WHEN EXISTS(SELECT timestamp FROM events e2 WHERE  e2.anonymousId = e1.anonymousId
         AND e2.event = 'Conversion'
         AND e2.timestamp >= e1.timestamp

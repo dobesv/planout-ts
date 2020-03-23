@@ -1,0 +1,335 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>planout-ts</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">planout-ts</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>planout-ts</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#planout" id="planout" style="color: inherit; text-decoration: none;">
+					<h1>PlanOut</h1>
+				</a>
+				<p><a href="http://facebook.github.io/planout/">PlanOut</a> is a system designed by Facebook to assist in running experiments in
+					applications.  This can be used to build your own A/B testing or gradual/partial feature
+				rollout system.</p>
+				<p>This project is a TypeScript/JavaScript implemenation of PlanOut.</p>
+				<p>To run an A/B test or other experiment, you use the library to select values/variants
+				deterministically based on the a user ID, client ID, or other factors.</p>
+				<p>This can also be used to rollout a feature to a subset of users and see whether
+				they experience additional errors as a result.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h3>Installation</h3>
+				</a>
+				<pre><code>yarn <span class="hljs-keyword">add</span><span class="bash"> planout-ts</span></code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h3>Usage</h3>
+				</a>
+				<p>When running an experiment, you use two pieces of information: </p>
+				<ol>
+					<li>the experiment name / ID, which is same for all users</li>
+					<li>a user / session / client identifier, which varies between users.  In this
+					library we call this the <code>salt</code> for lack of a better word</li>
+				</ol>
+				<p>The library helps you generate values that vary between users but will
+					always be the same for a given experiment &amp; user combination, so a
+					user who returns to the application will see the same variant again
+				the next time.</p>
+				<p>If you are doing an experiment that affects users that are not logged in,
+					you will need to generate a client ID and store it on the client computer,
+					in localStorage, a cookie, or wherever, so you can use the same value again
+				later.</p>
+				<p>If the user will always be logged in when they are exposed to an experiment
+					you can use their user ID and whatever system you already use to manage that
+				should be fine.</p>
+				<p>Here&#39;s a rough example:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { experiment } <span class="hljs-keyword">from</span> <span class="hljs-string">'planout-ts'</span>;
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>;
+
+<span class="hljs-comment">// Get previous client id or generate a new one</span>
+<span class="hljs-keyword">const</span> clientId = localStorage.clientId || (localStorage.clientId = [<span class="hljs-built_in">Date</span>.now(), <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random()*<span class="hljs-number">0xFFFFFFFF</span>)].join(<span class="hljs-string">'.'</span>));
+
+<span class="hljs-comment">// Prepare experiment</span>
+<span class="hljs-keyword">const</span> loginExperiment = experiment(<span class="hljs-string">'login'</span>);
+<span class="hljs-keyword">const</span> loginVariant = loginExperiment.choice([<span class="hljs-string">'A'</span>, <span class="hljs-string">'B'</span>], clientId);
+
+<span class="hljs-comment">// Imaginary React component that uses this</span>
+<span class="hljs-keyword">class</span> LoginControl <span class="hljs-keyword">extends</span> React.Component {
+  componentDidMount() {
+    <span class="hljs-comment">// Example of logging the event to Google Analytics</span>
+    ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'event'</span>, <span class="hljs-string">'experiments'</span>, <span class="hljs-string">'Login Page Loaded'</span>, <span class="hljs-string">`Variant <span class="hljs-subst">${loginVariant}</span>`</span>);        
+  }
+
+  render() {
+    <span class="hljs-keyword">if</span>(loginVariant === <span class="hljs-string">'A'</span>) {
+      <span class="hljs-comment">// show A version</span>
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-comment">// show B version</span>
+    }  
+  }
+}</code></pre>
+				<p>You should be able to create segments in your analytics database based on which
+					users triggered the event for each variant, and then compare the frequency of
+				your desired outcome between the groups.</p>
+				<p>If you want to do some kind of multivariate testing you can call <code>choice</code> once for
+					each variable, and then combine the resulting variables together.  Just be aware
+					that <code>choice</code> always returns the same array index for the same experiment <code>name</code> &amp;
+					<code>salt</code>, so you must vary at least one of these for each variable or the variables
+				will no be &quot;mixed up&quot; as intended.</p>
+				<a href="#using-planout-scripts" id="using-planout-scripts" style="color: inherit; text-decoration: none;">
+					<h3>Using PlanOut Scripts</h3>
+				</a>
+				<p>Part of PlanOut is the PlanOut language.  You can read about the language here:</p>
+				<ul>
+					<li><a href="https://facebook.github.io/planout/docs/planout-language.html">https://facebook.github.io/planout/docs/planout-language.html</a></li>
+				</ul>
+				<p>To use PlanOut scripts with this package, you must compile them to JSON, parse the
+					JSON to objects, and pass it to <code>execute</code>.  Provide an initial variable state
+					(especially anything you want to use as a <code>salt</code>, which is called <code>unit</code> in
+				the scripting language operations).</p>
+				<p>The script will assign any experiment variables / parameters and you can read
+				the calculated values by calling <code>get</code> on the experiment that is returned.</p>
+				<p>The idea behind the planout scripts is that you can make the system a bit more
+					abstract - the &quot;knobs and levers&quot; are the variables set by the PlanOut language
+					script, and the PlanOut language scripts are stored in some repository and
+				edited separately from the code.</p>
+				<p>The main use case I am aware of for this is that you can use it to allow the
+					experiment parameters to evolve dynamically without updating the application
+					code.  A feature can be added and distributed to internal testers.  Later,
+					some percentage of end users are exposed to the new feature.  Finally,
+				the feature can be enabled for everyone - or disabled.</p>
+				<p>In this model the application provides various useful pieces of information
+					about the current user (if there is one) as part of the experiment input
+					variables, loads and runs compiled PlanOut scripts from the database, and
+					then updates the user experience according to the variables set by the
+				experiment scripts.</p>
+				<p>Here&#39;s a rough example using a script:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { compile, execute } <span class="hljs-keyword">from</span> <span class="hljs-string">'planout-ts'</span>;
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>;
+
+<span class="hljs-comment">// Get previous client id or generate a new one</span>
+<span class="hljs-keyword">const</span> clientId = localStorage.clientId || (localStorage.clientId = [<span class="hljs-built_in">Date</span>.now(), <span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random()*<span class="hljs-number">0xFFFFFFFF</span>)].join(<span class="hljs-string">'.'</span>));
+
+<span class="hljs-comment">// Get the experiment code somehow, typically you would want to pre-compile this</span>
+<span class="hljs-comment">// and ship it in the HTML page so it is available immediately to the code that</span>
+<span class="hljs-comment">// depends on it</span>
+<span class="hljs-keyword">const</span> code = compile(<span class="hljs-string">`variant = uniformChoice(choices=['A', 'B'], unit=clientId);`</span>);
+
+<span class="hljs-comment">// Imaginary React component that uses this</span>
+<span class="hljs-keyword">class</span> LoginControl <span class="hljs-keyword">extends</span> React.Component {
+  experiment = execute(<span class="hljs-string">'login'</span>, code, { clientId });
+
+  componentDidMount() {
+    <span class="hljs-comment">// Example of logging the event to Google Analytics</span>
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.experiment.enabled) {
+      ga(<span class="hljs-string">'send'</span>, <span class="hljs-string">'event'</span>, <span class="hljs-string">'experiments'</span>, <span class="hljs-string">'Login Page Loaded'</span>, <span class="hljs-keyword">this</span>.experiment.getParamsText());
+    }        
+  }
+
+  render() {    
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.experiment.get(<span class="hljs-string">'variant'</span>) === <span class="hljs-string">'B'</span>) {
+      <span class="hljs-comment">// show B version</span>
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-comment">// show A / default version</span>
+    }  
+  }
+}</code></pre>
+				<a href="#disabling-experiments-in-the-script" id="disabling-experiments-in-the-script" style="color: inherit; text-decoration: none;">
+					<h4>Disabling experiments in the script</h4>
+				</a>
+				<p>Note that if the experiment has a <code>return false;</code> then the experiment will
+					be marked as disabled.  In this case, the application should not use any
+					values set by the script in the experiment and should not log the experiment
+				exposure to analytics.</p>
+				<p>When disabled, the experiment <code>get</code> will always return the default argument
+					provided (<code>null</code> by default) and the random selection methods will always
+					return zero, the first item, or the minimum value rather than applying the
+				hash function.</p>
+				<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
+					<h3>API Documentation</h3>
+				</a>
+				<p>There&#39;s API documentation describing all the generator functions available here:</p>
+				<ul>
+					<li><a href="https://planout-ts.readthedocs.io/">https://planout-ts.readthedocs.io/</a></li>
+				</ul>
+				<a href="#making-use-of-the-results" id="making-use-of-the-results" style="color: inherit; text-decoration: none;">
+					<h3>Making use of the results</h3>
+				</a>
+				<p>Note that analyzing these results and making good decisions based on them can be pretty
+				tricky and this library doesn&#39;t (yet) offer any assistance in the matter.</p>
+				<p>A good starting point for research on the matter might be <a href="https://www.evanmiller.org/bayesian-ab-testing.html">this blog</a></p>
+				<p>You may find it difficult or even impossible to actually use Google Analytics for this
+					purpose and instead you may wish to stream your analytics events into another service
+				that lets you keep and analyze all the events separately.</p>
+				<a href="#future-work" id="future-work" style="color: inherit; text-decoration: none;">
+					<h3>Future Work</h3>
+				</a>
+				<ul>
+					<li>PlanOut style namespace for mutually exclusive experiments selected at random</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_planoutcode_.html">&quot;<wbr>Plan<wbr>Out<wbr>Code&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_planoutexperiment_.html">&quot;<wbr>Plan<wbr>Out<wbr>Experiment&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_planoutinterpreter_.html">&quot;<wbr>Plan<wbr>Out<wbr>Interpreter&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_planoutparametergatherer_.html">&quot;<wbr>Plan<wbr>Out<wbr>Parameter<wbr>Gatherer&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_execute_.html">&quot;execute&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_experiment_.html">&quot;experiment&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_inspect_.html">&quot;inspect&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
