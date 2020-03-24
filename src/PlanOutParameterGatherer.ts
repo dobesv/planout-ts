@@ -201,7 +201,7 @@ const mergeParameters = (
 };
 
 /**
- * Give an experiment and some code, calculate the range of values that
+ * Given an experiment and some code, calculate the range of values that
  * the script might have output.  This can be used to display a user
  * interface to apply overrides to the experiments after they have run.
  */
