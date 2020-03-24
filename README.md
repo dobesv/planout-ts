@@ -158,9 +158,10 @@ hash function.
 
 ### API Documentation
 
-There's API documentation describing all the generator functions available here:
-
-* https://planout-ts.readthedocs.io/
+* [PlanOutExperiment](http://dobesv.com/planout-ts/classes/_planoutexperiment_.planoutexperiment.html)
+* [PlanOutInterpreter](http://dobesv.com/planout-ts/classes/_planoutinterpreter_.planoutinterpreter.html)
+* [PlanOutInterpreter](http://dobesv.com/planout-ts/classes/_planoutinterpreter_.planoutinterpreter.html)
+* [PlanOutParameterGatherer](http://dobesv.com/planout-ts/classes/_planoutparametergatherer_.planoutparametergatherer.html)
 
 ### Making use of the results
 
