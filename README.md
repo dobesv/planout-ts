@@ -160,7 +160,6 @@ hash function.
 
 * [PlanOutExperiment](http://dobesv.com/planout-ts/classes/_planoutexperiment_.planoutexperiment.html)
 * [PlanOutInterpreter](http://dobesv.com/planout-ts/classes/_planoutinterpreter_.planoutinterpreter.html)
-* [PlanOutInterpreter](http://dobesv.com/planout-ts/classes/_planoutinterpreter_.planoutinterpreter.html)
 * [PlanOutParameterGatherer](http://dobesv.com/planout-ts/classes/_planoutparametergatherer_.planoutparametergatherer.html)
 
 ### Making use of the results
