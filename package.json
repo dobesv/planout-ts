@@ -32,7 +32,7 @@
     "@types/lodash": "4.14.150",
     "@types/sha1": "1.1.2",
     "babel-jest": "25.5.1",
-    "jest": "25.5.3",
+    "jest": "25.5.4",
     "jest-fuzz": "0.0.1",
     "jison": "https://github.com/deathcap/jison.git#modulemain",
     "jsdoc": "3.6.4",
