@@ -39,6 +39,6 @@
     "jsdoc-to-markdown": "6.0.1",
     "prettier": "2.0.5",
     "typedoc": "0.17.8",
-    "typescript": "3.9.6"
+    "typescript": "3.9.7"
   }
 }
