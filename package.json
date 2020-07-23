@@ -35,7 +35,7 @@
     "jest": "26.1.0",
     "jest-fuzz": "0.0.1",
     "jison": "https://github.com/deathcap/jison.git#modulemain",
-    "jsdoc": "3.6.4",
+    "jsdoc": "3.6.5",
     "jsdoc-to-markdown": "6.0.1",
     "prettier": "2.0.5",
     "typedoc": "0.17.8",
