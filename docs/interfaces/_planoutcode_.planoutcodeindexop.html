@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>PlanOutCodeLiteralOp | planout-ts</title>
+	<title>PlanOutCodeIndexOp | planout-ts</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -59,10 +59,10 @@
 					<a href="../modules/_planoutcode_.html">&quot;PlanOutCode&quot;</a>
 				</li>
 				<li>
-					<a href="_planoutcode_.planoutcodeliteralop.html">PlanOutCodeLiteralOp</a>
+					<a href="_planoutcode_.planoutcodeindexop.html">PlanOutCodeIndexOp</a>
 				</li>
 			</ul>
-			<h1>Interface PlanOutCodeLiteralOp</h1>
+			<h1>Interface PlanOutCodeIndexOp</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">PlanOutCodeLiteralOp</span>
+						<span class="target">PlanOutCodeIndexOp</span>
 					</li>
 				</ul>
 			</section>
@@ -84,8 +84,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_planoutcode_.planoutcodeliteralop.html#op" class="tsd-kind-icon">op</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_planoutcode_.planoutcodeliteralop.html#value" class="tsd-kind-icon">value</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_planoutcode_.planoutcodeindexop.html#base" class="tsd-kind-icon">base</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_planoutcode_.planoutcodeindexop.html#index" class="tsd-kind-icon">index</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_planoutcode_.planoutcodeindexop.html#op" class="tsd-kind-icon">op</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,22 +95,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="op" class="tsd-anchor"></a>
-					<h3>op</h3>
-					<div class="tsd-signature tsd-kind-icon">op<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"literal"</span></div>
+					<a name="base" class="tsd-anchor"></a>
+					<h3>base</h3>
+					<div class="tsd-signature tsd-kind-icon">base<span class="tsd-signature-symbol">:</span> <a href="../modules/_planoutcode_.html#planoutcode" class="tsd-signature-type">PlanOutCode</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/dobesv/planout-ts/blob/553a3c6/src/PlanOutCode.ts#L6">PlanOutCode.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/dobesv/planout-ts/blob/553a3c6/src/PlanOutCode.ts#L102">PlanOutCode.ts:102</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="value" class="tsd-anchor"></a>
-					<h3>value</h3>
-					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <a href="_planoutcode_.planoutcodeobjectliteral.html" class="tsd-signature-type">PlanOutCodeObjectLiteral</a></div>
+					<a name="index" class="tsd-anchor"></a>
+					<h3>index</h3>
+					<div class="tsd-signature tsd-kind-icon">index<span class="tsd-signature-symbol">:</span> <a href="../modules/_planoutcode_.html#planoutcode" class="tsd-signature-type">PlanOutCode</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/dobesv/planout-ts/blob/553a3c6/src/PlanOutCode.ts#L7">PlanOutCode.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/dobesv/planout-ts/blob/553a3c6/src/PlanOutCode.ts#L103">PlanOutCode.ts:103</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="op" class="tsd-anchor"></a>
+					<h3>op</h3>
+					<div class="tsd-signature tsd-kind-icon">op<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"index"</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/dobesv/planout-ts/blob/553a3c6/src/PlanOutCode.ts#L101">PlanOutCode.ts:101</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,24 +178,27 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_planoutcode_.planoutcodeincludesop.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Includes<wbr>Op</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_planoutcode_.planoutcodeindexop.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Index<wbr>Op</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
-						<a href="_planoutcode_.planoutcodeliteralop.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Literal<wbr>Op</a>
+						<a href="_planoutcode_.planoutcodeindexop.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Index<wbr>Op</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_planoutcode_.planoutcodeliteralop.html#op" class="tsd-kind-icon">op</a>
+								<a href="_planoutcode_.planoutcodeindexop.html#base" class="tsd-kind-icon">base</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_planoutcode_.planoutcodeliteralop.html#value" class="tsd-kind-icon">value</a>
+								<a href="_planoutcode_.planoutcodeindexop.html#index" class="tsd-kind-icon">index</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_planoutcode_.planoutcodeindexop.html#op" class="tsd-kind-icon">op</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_planoutcode_.planoutcodeliteralop.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Literal<wbr>Op</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_planoutcode_.planoutcodeobjectliteral.html" class="tsd-kind-icon">Plan<wbr>Out<wbr>Code<wbr>Object<wbr>Literal</a>
 					</li>

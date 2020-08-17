@@ -7,7 +7,7 @@
     "build": "yarn build:compiler && yarn build:js && yarn build:docs",
     "build:compiler": "jison src/planout.jison -o src/parser.js -m commonjs --moduleMain 'function(){}'",
     "build:js": "mkdir -p dist && cp src/*.js src/*.d.ts dist/ && tsc",
-    "build:docs": "sphinx-build docs docs/_build/html",
+    "build:docs": "typedoc",
     "test": "jest && tsc --noEmit"
   },
   "homepage": "https://github.com/dobesv/planout-ts",
