@@ -7,7 +7,7 @@ rollout system.
 This project is a TypeScript/JavaScript implemenation of PlanOut.
 
 To run an A/B test or other experiment, you use the library to select values/variants
-deterministically based on the a user ID, client ID, or other factors.
+deterministically based on a user ID, client ID, or other factors.
 
 This can also be used to rollout a feature to a subset of users and see whether
 they experience additional errors as a result.
