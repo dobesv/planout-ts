@@ -6,6 +6,7 @@ import {
   PlanOutCodeCommutativeOp,
   PlanOutCodeCondOp,
   PlanOutCodeGetOp,
+  PlanOutCodeIncludesOp,
   PlanOutCodeLiteralOp,
   PlanOutCodeOp,
   PlanOutCodeRandomFilterOp,
@@ -17,7 +18,7 @@ import {
   PlanOutCodeUnaryOp,
   PlanOutCodeUniformChoiceOp,
   PlanOutCodeValue,
-  PlanOutCodeWeightedChoiceOp
+  PlanOutCodeWeightedChoiceOp,
 } from "./PlanOutCode";
 
 export class PlanOutInterpreter {
@@ -73,6 +74,34 @@ export class PlanOutInterpreter {
     return !!result;
   }
 
+  evalComparableArg<T extends PlanOutCodeOp>(
+    code: T,
+    name: string & keyof T
+  ): number | boolean | string | Date {
+    return this.evalComparable(code.op, name, code[name] as any);
+  }
+
+  evalComparable(
+    op: string,
+    param: string,
+    code: PlanOutCode
+  ): number | boolean | string | Date {
+    const result = this.evalCode(code);
+    if (
+      !(
+        typeof result === "number" ||
+        typeof result === "string" ||
+        typeof result === "boolean" ||
+        result instanceof Date
+      )
+    ) {
+      throw new Error(
+        `${op} ${param}: expected number, Date, string, or boolean but got ${result}`
+      );
+    }
+    return result;
+  }
+
   evalArray(op: string, name: string, code: PlanOutCode): PlanOutCodeValue[] {
     const result = this.evalCode(code);
     if (!Array.isArray(result)) {
@@ -90,7 +119,7 @@ export class PlanOutInterpreter {
 
   evalNumArray(op: string, name: string, values: PlanOutCode): number[] {
     const ary = this.evalArray(op, name, values);
-    if (!ary.every(n => typeof n === "number"))
+    if (!ary.every((n) => typeof n === "number"))
       throw new Error(
         `${op} ${name}: expected an array of only numbers, got ${ary}`
       );
@@ -135,14 +164,35 @@ export class PlanOutInterpreter {
   }
 
   array(code: PlanOutCodeArrayOp) {
-    return code.values.map(value => this.evalCode(value));
+    return code.values.map((value) => this.evalCode(value));
+  }
+
+  evalBinaryOp<T>(
+    code: PlanOutCodeBinaryOp,
+    fn: (
+      a: boolean | number | string | Date,
+      b: boolean | number | string | Date
+    ) => T,
+    evalArg: (
+      code: PlanOutCodeBinaryOp,
+      name: string & keyof PlanOutCodeBinaryOp
+    ) => boolean | number | string | Date
+  ): T {
+    return fn(evalArg(code, "left"), evalArg(code, "right"));
   }
 
   evalBinaryNumOp<T>(
     code: PlanOutCodeBinaryOp,
     fn: (a: number, b: number) => T
   ): T {
-    return fn(this.evalNumArg(code, "left"), this.evalNumArg(code, "right"));
+    return this.evalBinaryOp(code, fn, this.evalNumArg.bind(this));
+  }
+
+  evalBinaryComparableOp<T>(
+    code: PlanOutCodeBinaryOp,
+    fn: (a: number, b: number) => T
+  ): T {
+    return this.evalBinaryOp(code, fn, this.evalComparableArg.bind(this));
   }
 
   "%"(code: PlanOutCodeBinaryOp) {
@@ -158,19 +208,19 @@ export class PlanOutInterpreter {
   }
 
   "<"(code: PlanOutCodeBinaryOp) {
-    return this.evalBinaryNumOp(code, (a, b) => a < b);
+    return this.evalBinaryComparableOp(code, (a, b) => a < b);
   }
 
   "<="(code: PlanOutCodeBinaryOp) {
-    return this.evalBinaryNumOp(code, (a, b) => a <= b);
+    return this.evalBinaryComparableOp(code, (a, b) => a <= b);
   }
 
   ">"(code: PlanOutCodeBinaryOp) {
-    return this.evalBinaryNumOp(code, (a, b) => a > b);
+    return this.evalBinaryComparableOp(code, (a, b) => a > b);
   }
 
   ">="(code: PlanOutCodeBinaryOp) {
-    return this.evalBinaryNumOp(code, (a, b) => a >= b);
+    return this.evalBinaryComparableOp(code, (a, b) => a >= b);
   }
 
   negative(code: PlanOutCodeUnaryOp) {
@@ -178,7 +228,11 @@ export class PlanOutInterpreter {
   }
 
   equals(code: PlanOutCodeBinaryOp) {
-    return this.evalBinaryNumOp(code, (a, b) => a == b);
+    return this.evalBinaryOp(
+      code,
+      (a, b) => a == b,
+      (code, name) => this.evalCode(code[name])
+    );
   }
 
   evalLogicalCommutativeOp(
@@ -344,6 +398,11 @@ export class PlanOutInterpreter {
       this.evalArrayArg(code, "choices"),
       this.evalNumArrayArg(code, "weights"),
       this.evalSaltArg(code, "unit")
+    );
+  }
+  includes(code: PlanOutCodeIncludesOp) {
+    return this.evalArrayArg(code, "collection").includes(
+      this.evalCode(code.value)
     );
   }
 }

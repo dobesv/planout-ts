@@ -7,7 +7,7 @@ describe("execute", () => {
   test("Allows setting a variable from another variable", () => {
     expect(
       execute("evalCode", compile("out = anInt;"), {
-        anInt: 1
+        anInt: 1,
       }).get("out", 0)
     ).toBe(1);
   });
@@ -94,5 +94,36 @@ describe("execute", () => {
     expect(exp.get("o3")).toBe(false);
     expect(exp.get("n1")).toBe(false);
     expect(exp.get("n2")).toBe(true);
+  });
+  test("Supports == checks", () => {
+    const exp = execute(
+      "evalCode",
+      compile(
+        'st="a"=="a";sf="a"=="b";nt=12==12;nf=13==14;bt=true==true;bt2=false==false;bf=true==false;bf2=false==true;nt=null==null;nf=null==false;'
+      )
+    );
+    expect(exp.get("st")).toBe(true);
+    expect(exp.get("sf")).toBe(false);
+    expect(exp.get("nt")).toBe(true);
+    expect(exp.get("nf")).toBe(false);
+    expect(exp.get("bt")).toBe(true);
+    expect(exp.get("bt2")).toBe(true);
+    expect(exp.get("bf")).toBe(false);
+    expect(exp.get("bf2")).toBe(false);
+    expect(exp.get("nt")).toBe(true);
+    expect(exp.get("nf")).toBe(false);
+  });
+  test("implements includes", () => {
+    const exp = execute(
+      "evalCode",
+      compile(
+        'empty=includes(collection=[], value=1);num1=includes(collection=[1,2,3], value=1);num2=includes(collection=[1,2,3], value=4);str1=includes(collection=["a","b"], value="b");str2=includes(collection=["a","b"], value="c");'
+      )
+    );
+    expect(exp.get("empty")).toBe(false);
+    expect(exp.get("num1")).toBe(true);
+    expect(exp.get("num2")).toBe(false);
+    expect(exp.get("str1")).toBe(true);
+    expect(exp.get("str2")).toBe(false);
   });
 });

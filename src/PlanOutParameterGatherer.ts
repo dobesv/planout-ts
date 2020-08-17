@@ -6,6 +6,7 @@ import {
   PlanOutCodeCommutativeOp,
   PlanOutCodeCondOp,
   PlanOutCodeGetOp,
+  PlanOutCodeIncludesOp,
   PlanOutCodeLiteralOp,
   PlanOutCodeObjectLiteral,
   PlanOutCodeRandomFilterOp,
@@ -16,7 +17,7 @@ import {
   PlanOutCodeSetOp,
   PlanOutCodeUnaryOp,
   PlanOutCodeUniformChoiceOp,
-  PlanOutCodeWeightedChoiceOp
+  PlanOutCodeWeightedChoiceOp,
 } from "./PlanOutCode";
 import defaultTo from "lodash/defaultTo";
 import union from "lodash/union";
@@ -59,7 +60,7 @@ export type PlanOutParameter =
 export const booleanParameter: PlanOutParameter = {
   type: "select",
   limit: 1,
-  values: [false, true]
+  values: [false, true],
 };
 
 const binaryArithmeticCombinator = (
@@ -84,15 +85,15 @@ const binaryArithmeticCombinator = (
       return {
         type: right.type,
         max: fn(left, right.max),
-        min: fn(left, right.min)
+        min: fn(left, right.min),
       };
     } else if (right.type === "select") {
       return {
         type: "select",
         limit: right.limit,
-        values: right.values.map(value =>
+        values: right.values.map((value) =>
           binaryArithmeticCombinator(left, value, fn)
-        )
+        ),
       };
     }
   } else if (left.type === "float" || left.type === "integer") {
@@ -100,22 +101,22 @@ const binaryArithmeticCombinator = (
       return {
         type: left.type,
         max: fn(left.max, right),
-        min: fn(left.min, right)
+        min: fn(left.min, right),
       };
     } else if (right.type === "float" || right.type === "integer") {
       return {
         type:
           left.type === "float" || right.type === "float" ? "float" : "integer",
         max: fn(left.max, right.max),
-        min: fn(left.min, right.min)
+        min: fn(left.min, right.min),
       };
     } else if (right.type === "select") {
       return {
         type: "select",
         limit: right.limit,
-        values: right.values.map(value =>
+        values: right.values.map((value) =>
           binaryArithmeticCombinator(left, value, fn)
-        )
+        ),
       };
     }
     return null;
@@ -123,9 +124,9 @@ const binaryArithmeticCombinator = (
     return {
       type: "select",
       limit: left.limit,
-      values: left.values.map(value =>
+      values: left.values.map((value) =>
         binaryArithmeticCombinator(value, right, fn)
-      )
+      ),
     };
   }
   return null;
@@ -165,7 +166,7 @@ const mergeParameters = (
       return {
         type: right.type,
         min: Math.min(left.min, right.min),
-        max: Math.max(left.max, right.max)
+        max: Math.max(left.max, right.max),
       };
     }
     if (
@@ -177,26 +178,26 @@ const mergeParameters = (
       return {
         type: right.type,
         limit: 1,
-        values: union(left.values, right.values)
+        values: union(left.values, right.values),
       };
     }
     if (left.type === "union") {
       if (right.type === "union") {
         return {
           type: "union",
-          variants: [...left.variants, ...right.variants]
+          variants: [...left.variants, ...right.variants],
         };
       } else {
         return {
           type: "union",
-          variants: [...left.variants, right]
+          variants: [...left.variants, right],
         };
       }
     }
   }
   return {
     type: "union",
-    variants: [left, right]
+    variants: [left, right],
   };
 };
 
@@ -241,7 +242,7 @@ export class PlanOutParameterGatherer {
   array(code: PlanOutCodeArrayOp): PlanOutParameter {
     return {
       type: "array",
-      values: code.values.map(value => this.evalCode(value))
+      values: code.values.map((value) => this.evalCode(value)),
     };
   }
 
@@ -332,24 +333,24 @@ export class PlanOutParameterGatherer {
   }
 
   max(code: PlanOutCodeCommutativeOp): PlanOutParameter {
-    const values = code.values.map(operand => this.evalCode(operand));
+    const values = code.values.map((operand) => this.evalCode(operand));
     return values.reduce((a, b) => binaryArithmeticCombinator(a, b, Math.max));
   }
 
   min(code: PlanOutCodeCommutativeOp): PlanOutParameter {
-    const values = code.values.map(operand => this.evalCode(operand));
+    const values = code.values.map((operand) => this.evalCode(operand));
     return values.reduce((a, b) => binaryArithmeticCombinator(a, b, Math.min));
   }
 
   product(code: PlanOutCodeCommutativeOp): PlanOutParameter {
-    const values = code.values.map(operand => this.evalCode(operand));
+    const values = code.values.map((operand) => this.evalCode(operand));
     return values.reduce((a, b) =>
       binaryArithmeticCombinator(a, b, (x, y) => x * y)
     );
   }
 
   sum(code: PlanOutCodeCommutativeOp): PlanOutParameter {
-    const values = code.values.map(operand => this.evalCode(operand));
+    const values = code.values.map((operand) => this.evalCode(operand));
     return values.reduce((a, b) =>
       binaryArithmeticCombinator(a, b, (x, y) => x + y)
     );
@@ -417,19 +418,19 @@ export class PlanOutParameterGatherer {
           return {
             type: "integer",
             min: Math.round(param.min),
-            max: Math.round(param.max)
+            max: Math.round(param.max),
           };
         if (param.type === "select") {
           return {
             type: "select",
             limit: param.limit,
-            values: param.values.map(roundImpl)
+            values: param.values.map(roundImpl),
           };
         }
         if (param.type === "union") {
           return {
             type: "union",
-            variants: param.variants.map(roundImpl)
+            variants: param.variants.map(roundImpl),
           };
         }
       }
@@ -444,7 +445,7 @@ export class PlanOutParameterGatherer {
       return {
         type: "select",
         limit: choices.values.length,
-        values: choices.values
+        values: choices.values,
       };
     }
     return null;
@@ -484,7 +485,7 @@ export class PlanOutParameterGatherer {
       return {
         type: "select",
         limit: numDraws,
-        values: choices.values
+        values: choices.values,
       };
     }
     return null;
@@ -496,7 +497,7 @@ export class PlanOutParameterGatherer {
       return {
         type: "select",
         limit: 1,
-        values: choices.values
+        values: choices.values,
       };
     }
     return null;
@@ -508,9 +509,13 @@ export class PlanOutParameterGatherer {
       return {
         type: "select",
         limit: 1,
-        values: choices.values
+        values: choices.values,
       };
     }
     return null;
+  }
+
+  includes(code: PlanOutCodeIncludesOp): PlanOutParameter {
+    return booleanParameter;
   }
 }

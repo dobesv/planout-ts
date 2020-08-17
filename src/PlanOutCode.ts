@@ -92,6 +92,11 @@ export interface PlanOutCodeSampleOp {
   draws: PlanOutCode;
   unit: PlanOutCode;
 }
+export interface PlanOutCodeIncludesOp {
+  op: "includes";
+  collection: PlanOutCode;
+  value: PlanOutCode;
+}
 export type PlanOutCodeRandomOp =
   | PlanOutCodeRandomRangeOp
   | PlanOutCodeRandomTrialOp
@@ -109,7 +114,8 @@ export type PlanOutCodeCoreOp =
   | PlanOutCodeArrayOp
   | PlanOutCodeBinaryOp
   | PlanOutCodeUnaryOp
-  | PlanOutCodeCommutativeOp;
+  | PlanOutCodeCommutativeOp
+  | PlanOutCodeIncludesOp;
 
 export type PlanOutCodeOp = PlanOutCodeCoreOp | PlanOutCodeRandomOp;
 
