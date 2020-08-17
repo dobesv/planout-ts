@@ -7,6 +7,7 @@ import {
   PlanOutCodeCondOp,
   PlanOutCodeGetOp,
   PlanOutCodeIncludesOp,
+  PlanOutCodeIndexOp,
   PlanOutCodeLiteralOp,
   PlanOutCodeObjectLiteral,
   PlanOutCodeRandomFilterOp,
@@ -232,6 +233,7 @@ export class PlanOutParameterGatherer {
 
     const op = code.op;
     const impl = this[op];
+    if (!impl) throw new Error(`Unsupported op: ${op}`);
     return impl.call(this, code);
   }
 
@@ -244,6 +246,11 @@ export class PlanOutParameterGatherer {
       type: "array",
       values: code.values.map((value) => this.evalCode(value)),
     };
+  }
+
+  index(code: PlanOutCodeIndexOp): PlanOutParameter {
+    // Figuring out the type of the value is too hard with an index operation
+    return null;
   }
 
   calculateBinaryArithmetic(

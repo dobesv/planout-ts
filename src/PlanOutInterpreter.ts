@@ -7,6 +7,7 @@ import {
   PlanOutCodeCondOp,
   PlanOutCodeGetOp,
   PlanOutCodeIncludesOp,
+  PlanOutCodeIndexOp,
   PlanOutCodeLiteralOp,
   PlanOutCodeOp,
   PlanOutCodeRandomFilterOp,
@@ -165,6 +166,23 @@ export class PlanOutInterpreter {
 
   array(code: PlanOutCodeArrayOp) {
     return code.values.map((value) => this.evalCode(value));
+  }
+
+  index(code: PlanOutCodeIndexOp) {
+    const base = this.evalCode(code.base);
+    if (typeof base !== "object")
+      throw new Error("Attempt to index a non-array and non-object");
+    const index = this.evalCode(code.index);
+    if (Array.isArray(base)) {
+      if (typeof index !== "number") {
+        throw new Error("Array index is not a number");
+      }
+    } else if (typeof index !== "string") {
+      throw new Error("Object field name is not a string");
+    }
+    const value = base[index];
+    if (typeof value === "function") return null;
+    return value;
   }
 
   evalBinaryOp<T>(

@@ -126,4 +126,9 @@ describe("execute", () => {
     expect(exp.get("str1")).toBe(true);
     expect(exp.get("str2")).toBe(false);
   });
+  test("implements index operation", () => {
+    const exp = execute("evalCode", compile('a=@{"A": 1}["A"];b=[1,2,3][2];'));
+    expect(exp.get("a")).toBe(1);
+    expect(exp.get("b")).toBe(3);
+  });
 });

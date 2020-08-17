@@ -8,7 +8,7 @@ describe("inspect", () => {
   test("Allows setting a variable from another variable", () => {
     expect(
       inspect(compile("out = anInt;"), {
-        anInt: 1
+        anInt: 1,
       }).parameters
     ).toMatchObject({ out: 1 });
   });
@@ -24,13 +24,13 @@ describe("inspect", () => {
       a: {
         type: "select",
         limit: 1,
-        values: ["a", "b"]
+        values: ["a", "b"],
       },
       b: {
         type: "select",
         limit: 1,
-        values: ["aaa", "bbb"]
-      }
+        values: ["aaa", "bbb"],
+      },
     });
   });
   test("Supports weightedChoice", () => {
@@ -45,13 +45,13 @@ describe("inspect", () => {
       a: {
         type: "select",
         limit: 1,
-        values: ["a", "b"]
+        values: ["a", "b"],
       },
       b: {
         type: "select",
         limit: 1,
-        values: ["aaa", "bbb"]
-      }
+        values: ["aaa", "bbb"],
+      },
     });
   });
   test("Supports conditionals", () => {
@@ -83,12 +83,12 @@ describe("inspect", () => {
         type: "union",
         variants: [
           { type: "select", limit: 2, values: ["A", "B", "C"] },
-          { type: "select", limit: 3, values: ["A", "B", "C"] }
-        ]
+          { type: "select", limit: 3, values: ["A", "B", "C"] },
+        ],
       },
       t: { type: "select", limit: 1, values: [2, 4, 6, 8] },
       tt: { type: "select", limit: 1, values: [2, 4, 6, 8] },
-      ttt: { type: "select", limit: 1, values: [3, 5, 7, 9] }
+      ttt: { type: "select", limit: 1, values: [3, 5, 7, 9] },
     });
   });
   test("Supports arithmetic", () => {
@@ -103,7 +103,7 @@ describe("inspect", () => {
       difference: 13,
       product: 6,
       quotient: 3,
-      modulo: 3
+      modulo: 3,
     });
   });
   test("Supports comparisons", () => {
@@ -121,7 +121,7 @@ describe("inspect", () => {
       nlt: booleanParameter,
       nlte: booleanParameter,
       ngt: booleanParameter,
-      ngte: booleanParameter
+      ngte: booleanParameter,
     });
   });
   test("Supports logical operators", () => {
@@ -139,7 +139,10 @@ describe("inspect", () => {
       o2: booleanParameter,
       o3: booleanParameter,
       n1: booleanParameter,
-      n2: booleanParameter
+      n2: booleanParameter,
     });
+  });
+  test("Does not error on index operation", () => {
+    expect(inspect(compile('a=@{"A": 1}["A"];')).parameters).toMatchObject({});
   });
 });
