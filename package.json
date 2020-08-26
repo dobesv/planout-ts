@@ -37,7 +37,7 @@
     "jison": "https://github.com/deathcap/jison.git#modulemain",
     "jsdoc": "3.6.5",
     "jsdoc-to-markdown": "6.0.1",
-    "prettier": "2.1.0",
+    "prettier": "2.1.1",
     "typedoc": "0.18.0",
     "typescript": "4.0.2"
   }
