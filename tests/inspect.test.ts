@@ -1,16 +1,22 @@
-import { compile, inspect } from "../src";
+import { compile, floatParameter, inspect } from "../src";
 import { booleanParameter } from "../src/PlanOutParameterGatherer";
 
 describe("inspect", () => {
-  test("Allows setting a variable", () => {
-    expect(inspect(compile("out = 1;")).parameters).toMatchObject({ out: 1 });
+  test("Allows setting a constant", () => {
+    expect(
+      inspect(compile("a = 1;b = true;c = false;")).parameters
+    ).toMatchObject({
+      a: floatParameter,
+      b: booleanParameter,
+      c: booleanParameter,
+    });
   });
   test("Allows setting a variable from another variable", () => {
     expect(
       inspect(compile("out = anInt;"), {
         anInt: 1,
       }).parameters
-    ).toMatchObject({ out: 1 });
+    ).toMatchObject({ out: floatParameter });
   });
   test("Supports uniformChoice", () => {
     expect(
@@ -76,7 +82,7 @@ describe("inspect", () => {
       ).parameters
     ).toMatchObject({
       a: { type: "select", values: [1, 2] },
-      b: 3,
+      b: floatParameter,
       q: { type: "select", limit: 1, values: ["A", "B", "C", "D"] },
       r: { type: "select", limit: 1, values: [1, 2, 3, 4] },
       s: {
@@ -99,11 +105,11 @@ describe("inspect", () => {
         )
       ).parameters
     ).toMatchObject({
-      sum: 3,
-      difference: 13,
-      product: 6,
-      quotient: 3,
-      modulo: 3,
+      sum: floatParameter,
+      difference: floatParameter,
+      product: floatParameter,
+      quotient: floatParameter,
+      modulo: floatParameter,
     });
   });
   test("Supports comparisons", () => {

@@ -64,6 +64,12 @@ export const booleanParameter: PlanOutParameter = {
   values: [false, true],
 };
 
+export const floatParameter: PlanOutParameter = {
+  type: "float",
+  min: Number.MIN_VALUE,
+  max: Number.MAX_VALUE,
+};
+
 const binaryArithmeticCombinator = (
   left: PlanOutParameter,
   right: PlanOutParameter,
@@ -216,7 +222,15 @@ export class PlanOutParameterGatherer {
 
   inspect(code: PlanOutCode) {
     this.evalCode(code);
-    return this.environment;
+    const parameters: MetaEnvironment = {...this.environment};
+    for(const [k, v] of Object.entries(parameters)) {
+      if(typeof v === 'number') {
+        parameters[k] = floatParameter;
+      } else if(typeof v === 'boolean') {
+        parameters[k] = booleanParameter;
+      }
+    }
+    return parameters;
   }
 
   evalCode(code: PlanOutCode): PlanOutParameter {
