@@ -1,6 +1,6 @@
 {
   "name": "planout-ts",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "TypeScript/JavaScript implementation of PlanOut experimentation system",
   "main": "dist/index.js",
   "scripts": {
