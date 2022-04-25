@@ -95,6 +95,14 @@ describe("execute", () => {
     expect(exp.get("n1")).toBe(false);
     expect(exp.get("n2")).toBe(true);
   });
+  test("Logical and/or do not fail if the left operand is enough to determine the outcome", () => {
+    const exp = execute(
+        "evalCode",
+        compile(
+            "a1=true||(null<10);b1=false&&(null<10);"
+        )
+    );
+  })
   test("Supports == checks", () => {
     const exp = execute(
       "evalCode",

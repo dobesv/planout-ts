@@ -176,3 +176,13 @@ that lets you keep and analyze all the events separately.
 ### Future Work
 
 * PlanOut style namespace for mutually exclusive experiments selected at random
+
+### History
+
+### 1.1.0
+
+Fix issue where `&&` and `||` did not stop evaluating early if the outcome was already determined.
+
+### 1.0.0
+
+Initial npm release

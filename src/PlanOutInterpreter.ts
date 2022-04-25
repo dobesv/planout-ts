@@ -253,20 +253,12 @@ export class PlanOutInterpreter {
     );
   }
 
-  evalLogicalCommutativeOp(
-    code: PlanOutCodeCommutativeOp,
-    fn: (a: boolean, b: boolean) => boolean
-  ) {
-    return code.values
-      .map((arg, n) => this.evalBool(arg))
-      .reduce((p: boolean, v: boolean) => fn(p, v));
-  }
   and(code: PlanOutCodeCommutativeOp) {
-    return this.evalLogicalCommutativeOp(code, (a, b) => a && b);
+    return !code.values.some(arg => !this.evalBool(arg));
   }
 
   or(code: PlanOutCodeCommutativeOp) {
-    return this.evalLogicalCommutativeOp(code, (a, b) => a || b);
+    return code.values.some(arg => this.evalBool(arg));
   }
 
   length(code: PlanOutCodeUnaryOp) {
