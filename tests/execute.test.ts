@@ -83,7 +83,7 @@ describe("execute", () => {
     const exp = execute(
       "evalCode",
       compile(
-        "a1=true&&true;a2=true&&false;a3=false&&true;o1=true||false;o2=false||true;o3=false||false;n1=!true;n2=!false;"
+        "a1=true&&true;a2=true&&false;a3=false&&true;o1=true||false;o2=false||true;o3=false||false;n1=!true;n2=!false;n3=!null;n4=!!null;"
       )
     );
     expect(exp.get("a1")).toBe(true);
@@ -94,6 +94,8 @@ describe("execute", () => {
     expect(exp.get("o3")).toBe(false);
     expect(exp.get("n1")).toBe(false);
     expect(exp.get("n2")).toBe(true);
+    expect(exp.get("n3")).toBe(true);
+    expect(exp.get("n4")).toBe(false);
   });
   test("Logical and/or do not fail if the left operand is enough to determine the outcome", () => {
     const exp = execute(
@@ -102,6 +104,8 @@ describe("execute", () => {
             "a1=true||(null<10);b1=false&&(null<10);"
         )
     );
+    expect(exp.get("a1")).toBe(true);
+    expect(exp.get("b1")).toBe(false);
   })
   test("Supports == checks", () => {
     const exp = execute(
