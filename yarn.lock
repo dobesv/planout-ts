@@ -2916,10 +2916,10 @@ jest-environment-node@^28.1.1:
     jest-mock "^28.1.1"
     jest-util "^28.1.1"
 
-jest-fuzz@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/jest-fuzz/-/jest-fuzz-0.0.1.tgz#5843aa3ff8fb26d01b6e4126b5a7c1f7f5536399"
-  integrity sha512-aeGnJrcFHgPnoI8/pcj5jzXDium6oUz9eOzYSURwysgxOtp1avfrY0+YZRg0AqOus96FGvGRo0mj1wa28ovTow==
+jest-fuzz@0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/jest-fuzz/-/jest-fuzz-0.1.2.tgz#5b5b7890a14384fa1730716f4f4866073d02032f"
+  integrity sha512-K1LchNcJqJhgOT0+CFf4QTQ6TuoYvsbGxnF1k+4iuR7g+82AOKfgoyUOqMpzQrabrqqyTH3XtMH8CMsV3NvqJQ==
   dependencies:
     lodash "^4.17.11"
 
