@@ -25,9 +25,9 @@
     "sha1": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "7.18.5",
-    "@babel/preset-env": "7.18.2",
-    "@babel/preset-typescript": "7.17.12",
+    "@babel/core": "7.25.9",
+    "@babel/preset-env": "7.25.9",
+    "@babel/preset-typescript": "7.25.9",
     "@types/jest": "28.1.1",
     "@types/lodash": "4.14.182",
     "@types/sha1": "1.1.3",
