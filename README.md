@@ -1,8 +1,11 @@
 # PlanOut
 
-[PlanOut](http://facebook.github.io/planout/) is a system designed by Facebook to assist in running experiments in
+[PlanOut](https://github.com/facebookarchive/planout) is a system designed by Facebook to assist in running experiments in
 applications.  This can be used to build your own A/B testing or gradual/partial feature
 rollout system.
+
+Facebook archived PlanOut and took down its documentation site, so this repo carries its
+own [PlanOut language reference](LANGUAGE.md) describing the dialect implemented here.
 
 This project is a TypeScript/JavaScript implemenation of PlanOut.
 
@@ -49,7 +52,7 @@ const clientId = localStorage.clientId || (localStorage.clientId = [Date.now(), 
 
 // Prepare experiment
 const loginExperiment = experiment('login');
-const loginVariant = loginExperiment.choice(['A', 'B'], clientId);
+const loginVariant = loginExperiment.uniformChoice(['A', 'B'], clientId);
 
 // Imaginary React component that uses this
 class LoginControl extends React.Component {
@@ -72,17 +75,22 @@ You should be able to create segments in your analytics database based on which
 users triggered the event for each variant, and then compare the frequency of 
 your desired outcome between the groups.
 
-If you want to do some kind of multivariate testing you can call `choice` once for
+If you want to do some kind of multivariate testing you can call `uniformChoice` once for
 each variable, and then combine the resulting variables together.  Just be aware
-that `choice` always returns the same array index for the same experiment `name` &
+that `uniformChoice` always returns the same array index for the same experiment `name` &
 `salt`, so you must vary at least one of these for each variable or the variables
-will no be "mixed up" as intended.
+will no be "mixed up" as intended.  Passing an array as the salt is the easiest way to
+do that — `uniformChoice(['A', 'B'], [clientId, 'buttonColor'])`.
 
 ### Using PlanOut Scripts
 
 Part of PlanOut is the PlanOut language.  You can read about the language here:
 
-* https://facebook.github.io/planout/docs/planout-language.html
+* [PlanOut language reference](LANGUAGE.md) — the dialect this package implements,
+  including the operators supported, how assignment is hashed, and where this port
+  differs from Facebook's
+* [Facebook's original language docs](https://github.com/facebookarchive/planout/blob/master/python/docs/07-language.md)
+  — background on the design, but written against the Python implementation
 
 To use PlanOut scripts with this package, you must compile them to JSON, parse the
 JSON to objects, and pass it to `execute`.  Provide an initial variable state
@@ -152,15 +160,28 @@ values set by the script in the experiment and should not log the experiment
 exposure to analytics.
 
 When disabled, the experiment `get` will always return the default argument
-provided (`null` by default) and the random selection methods will always
-return zero, the first item, or the minimum value rather than applying the
-hash function.
+provided (`null` by default).  The hash is also forced to zero, so
+`uniformChoice` returns the first item and `randomInteger` / `randomFloat`
+return their minimum.
+
+Be careful with the other random methods when disabled: a zero hash is below
+every threshold, so `bernoulliTrial` returns `1` for any non-zero `p` and
+`bernoulliFilter` keeps every choice.  Gate on `enabled` and read values through
+`get` with an explicit default rather than relying on those return values.  See
+[the language reference](LANGUAGE.md#behavior-when-an-experiment-is-disabled)
+for the full table.
 
 ### API Documentation
 
-* [PlanOutExperiment](http://dobesv.com/planout-ts/classes/_planoutexperiment_.planoutexperiment.html)
-* [PlanOutInterpreter](http://dobesv.com/planout-ts/classes/_planoutinterpreter_.planoutinterpreter.html)
-* [PlanOutParameterGatherer](http://dobesv.com/planout-ts/classes/_planoutparametergatherer_.planoutparametergatherer.html)
+Generated API docs: [dobesv.com/planout-ts](https://dobesv.com/planout-ts/)
+
+* [PlanOutExperiment](https://dobesv.com/planout-ts/classes/PlanOutExperiment.html)
+* [PlanOutInterpreter](https://dobesv.com/planout-ts/classes/PlanOutInterpreter.html)
+* [PlanOutParameterGatherer](https://dobesv.com/planout-ts/classes/PlanOutParameterGatherer.html)
+* [compile](https://dobesv.com/planout-ts/functions/compile.html) /
+  [execute](https://dobesv.com/planout-ts/functions/execute.html) /
+  [experiment](https://dobesv.com/planout-ts/functions/experiment.html) /
+  [inspect](https://dobesv.com/planout-ts/functions/inspect.html)
 
 ### Making use of the results
 
@@ -176,6 +197,10 @@ that lets you keep and analyze all the events separately.
 ### Future Work
 
 * PlanOut style namespace for mutually exclusive experiments selected at random
+* `coalesce` (the `??` operator) and `switch` — both parse but throw
+  `Unsupported op` when executed, since the interpreter has no implementation for them
+* Per-variable salting, so two variables assigned from the same `unit` aren't
+  perfectly correlated
 
 ### History
 
