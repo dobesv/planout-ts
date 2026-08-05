@@ -4,7 +4,7 @@ import {
   PlanOutParameterGatherer
 } from "./PlanOutParameterGatherer";
 
-type PlanOutScriptMetadata = { parameters: MetaEnvironment };
+export type PlanOutScriptMetadata = { parameters: MetaEnvironment };
 
 const inspect = (
   code: PlanOutCode,

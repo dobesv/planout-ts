@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "readme": "none",
+  "name": "planout-ts"
+}

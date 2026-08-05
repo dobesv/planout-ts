@@ -7,4 +7,6 @@ import { parse as compile } from "./parser";
 import execute from "./execute";
 import inspect from "./inspect";
 
+export type { PlanOutScriptMetadata } from "./inspect";
+
 export { compile, execute, experiment, inspect };
