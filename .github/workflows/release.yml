@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
   # Lets you re-run the release step if a publish fails partway through
-  # (e.g. an expired NPM_TOKEN) without pushing an empty commit.
+  # without having to push an empty commit.
   workflow_dispatch:
 
 concurrency:
@@ -17,6 +17,9 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
+  # Required for npm trusted publishing: npm exchanges this short-lived OIDC
+  # token for publish rights, so there is no npm token stored in this repo.
+  id-token: write
 
 jobs:
   release:
@@ -29,13 +32,13 @@ jobs:
           # new since the last release.
           fetch-depth: 0
 
-      # Deliberately no `registry-url:` here. That option makes setup-node
-      # write an .npmrc containing a literal `${NODE_AUTH_TOKEN}` placeholder,
-      # and setup-node then calls `yarn cache dir` for the `cache: yarn` step.
-      # Yarn 1 expands environment variables in .npmrc eagerly and throws
-      # "Failed to replace env in config" when the variable is not yet set,
-      # which fails the job before it reaches the publish step. Authentication
-      # is written explicitly below instead.
+      # Deliberately no `registry-url:` here. It makes setup-node write an
+      # .npmrc containing a literal `${NODE_AUTH_TOKEN}` placeholder, and
+      # setup-node then calls `yarn cache dir` for the `cache: yarn` step.
+      # Yarn 1 expands .npmrc environment variables eagerly and throws
+      # "Failed to replace env in config" when the variable is unset, failing
+      # the job before it ever reaches the publish step. Nothing needs it here
+      # anyway - trusted publishing supplies the credential.
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -43,12 +46,20 @@ jobs:
 
       - run: yarn install --frozen-lockfile
 
-      - name: Authenticate with npm
-        # Written to $HOME rather than the workspace so it can never be picked
-        # up by the commit the changesets action makes.
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> "$HOME/.npmrc"
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Trusted publishing needs npm >= 11.5.1. Node 24 currently ships a new
+      # enough npm, but that is a property of the runner image rather than
+      # anything this repo controls. Assert it rather than upgrading npm on
+      # every run: if a runner image ever ships something older, this fails
+      # with a clear message instead of an opaque auth error at publish time.
+      - name: Check npm supports trusted publishing
+        run: |
+          need=11.5.1
+          have=$(npm --version)
+          echo "npm $have"
+          if [ "$(printf '%s\n%s\n' "$need" "$have" | sort -V | head -1)" != "$need" ]; then
+            echo "::error::npm $have is too old for trusted publishing (need >= $need)"
+            exit 1
+          fi
 
       # Two modes, decided by the action:
       #

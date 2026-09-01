@@ -238,6 +238,14 @@ Once the pull request merges, a bot opens or updates a pull request titled
 and creates the GitHub release. So nothing ships until you deliberately merge
 the version pull request.
 
+Publishing authenticates with npm [trusted
+publishing](https://docs.npmjs.com/trusted-publishers), so there is no npm
+token stored in this repository and nothing to rotate. npm accepts the release
+job's short-lived OIDC token because `planout-ts` lists this repository and
+`.github/workflows/release.yml` as a trusted publisher. If you rename or move
+that workflow file, update the trusted publisher on npm to match or publishing
+will start failing with an authentication error.
+
 ### History
 
 Releases from 1.1.1 onward are recorded in
