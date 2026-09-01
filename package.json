@@ -25,6 +25,9 @@
   "author": "Dobes Vandermeer <dobesv@gmail.com>",
   "sideEffects": false,
   "license": "MIT",
+  "publishConfig": {
+    "provenance": true
+  },
   "dependencies": {
     "lodash": "^4.18.1",
     "sha1": "^1.1.1"
