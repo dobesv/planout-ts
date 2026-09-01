@@ -1,5 +1,11 @@
 # planout-ts
 
+## 1.1.3
+
+### Patch Changes
+
+- 652040c: Restore npm build provenance, which was missing from the 1.1.2 release.
+
 ## 1.1.2
 
 ### Patch Changes
