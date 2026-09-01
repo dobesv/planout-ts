@@ -202,7 +202,47 @@ that lets you keep and analyze all the events separately.
 * Per-variable salting, so two variables assigned from the same `unit` aren't
   perfectly correlated
 
+### Development
+
+Run the tests and the typecheck:
+
+```sh
+yarn test
+```
+
+Rebuild the jison parser, `dist/`, and the typedoc site under `docs/`:
+
+```sh
+yarn build
+```
+
+`src/parser.js` is generated from `src/planout.jison` but committed to the
+repository, so run `yarn build:compiler` and commit the result whenever you
+change the grammar. CI fails if the two are out of sync.
+
+### Releasing
+
+Releases are cut by changesets. Any pull request that changes behaviour should
+include a changeset describing it:
+
+```sh
+yarn changeset
+```
+
+That writes a markdown file under `.changeset/` recording whether the change is
+a patch, minor, or major. Commit it with the rest of your work.
+
+Once the pull request merges, a bot opens or updates a pull request titled
+"Version Packages" that applies the accumulated version bump and rewrites
+`CHANGELOG.md`. Merging *that* pull request publishes to npm, tags the commit,
+and creates the GitHub release. So nothing ships until you deliberately merge
+the version pull request.
+
 ### History
+
+Releases from 1.1.1 onward are recorded in
+[CHANGELOG.md](CHANGELOG.md), which changesets maintains. The entries below
+predate it.
 
 ### 1.1.0
 
