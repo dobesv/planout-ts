@@ -43,7 +43,7 @@
     "jison": "https://github.com/deathcap/jison.git#modulemain",
     "prettier": "3.9.6",
     "typedoc": "0.28.20",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=20.19"
