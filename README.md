@@ -238,6 +238,12 @@ Once the pull request merges, a bot opens or updates a pull request titled
 and creates the GitHub release. So nothing ships until you deliberately merge
 the version pull request.
 
+The bot is a GitHub App rather than the built-in `GITHUB_TOKEN`, because
+GitHub will not trigger workflow runs from events its own token creates — the
+version pull request would get no CI and could never satisfy the required
+checks on `master`. The app's ID lives in the `RELEASE_BOT_APP_ID` repository
+variable and its private key in the `RELEASE_BOT_PRIVATE_KEY` secret.
+
 Publishing authenticates with npm [trusted
 publishing](https://docs.npmjs.com/trusted-publishers), so there is no npm
 token stored in this repository and nothing to rotate. npm accepts the release
