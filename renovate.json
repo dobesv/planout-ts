@@ -19,6 +19,21 @@
       "description": "@changesets/cli 3.x requires yarn >= 4.5.2 and this repo is on yarn 1 classic, so 3.x cannot be installed. Drop this rule when the repo moves to yarn 4.",
       "matchPackageNames": ["@changesets/cli"],
       "allowedVersions": "<3"
+    },
+    {
+      "description": "changesets/action v2 renames every input this repo passes (version -> version-script, publish -> publish-script, commit -> commit-message, title -> pr-title), stops reading GITHUB_TOKEN from the environment in favour of a github-token input, and expects @changesets/cli 3.x, which is itself blocked by yarn 1. Adopt it together with the yarn 4 migration, updating .github/workflows/release.yml in the same change.",
+      "matchPackageNames": ["changesets/action"],
+      "allowedVersions": "<2"
+    },
+    {
+      "description": "Babel 8 requires node ^22.18.0 || >=24.11.0, which drops the Node 20 row of the CI matrix, and jest 30's babel-jest still declares a peer dependency on @babel/core ^7. Lift this once Node 20 is out of the matrix and babel-jest supports 8.",
+      "matchPackageNames": ["@babel/**"],
+      "allowedVersions": "<8"
+    },
+    {
+      "description": "typedoc 0.28 declares a typescript peer range topping out at 6.0.x and crashes on TypeScript 7 with \"Cannot read properties of undefined (reading 'PropertyDeclaration')\". Lift this when typedoc supports TypeScript 7.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
   ]
 }
