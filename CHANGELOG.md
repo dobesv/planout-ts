@@ -1,5 +1,12 @@
 # planout-ts
 
+## 1.1.2
+
+### Patch Changes
+
+- 7cd7268: Move the build tooling to Yarn 4 and Changesets 3. No change to the published
+  library.
+
 ## 1.1.1
 
 ### Patch Changes
