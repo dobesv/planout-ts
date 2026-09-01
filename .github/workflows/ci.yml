@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  # Verify the trunk directly as well as PRs: a squash-merge lands on master as
+  # a plain commit with no pull_request event, so without this a merge could
+  # break master without any check going red. Scoping push to master (rather
+  # than all branches) keeps PR-branch commits from being built twice.
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      # Report every Node version's result rather than cancelling the matrix on
+      # the first failure - a break on one version only is the useful signal.
+      fail-fast: false
+      matrix:
+        # 20 is the floor declared in package.json "engines"; 24 is current LTS.
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      # `yarn test` is jest followed by `tsc --noEmit`, so this covers both the
+      # test suite and the typecheck.
+      - run: yarn test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      # Builds the jison parser, compiles to dist/, and renders the typedoc
+      # site - the same three steps the release runs, so a broken build is
+      # caught on the PR rather than at publish time.
+      - run: yarn build
+
+      # src/parser.js is generated from src/planout.jison but committed to the
+      # repo, so the two can silently diverge if someone edits the grammar
+      # without rebuilding. Regenerating it above and diffing here catches that.
+      #
+      # docs/ is deliberately NOT drift-checked even though it is committed:
+      # its contents change with every typedoc release, which would turn a
+      # routine typedoc bump into a red build and block Renovate automerge.
+      - name: Check generated parser is in sync with the grammar
+        run: |
+          if ! git diff --exit-code -- src/parser.js; then
+            echo "::error::src/parser.js is out of date. Run 'yarn build:compiler' and commit the result."
+            exit 1
+          fi
