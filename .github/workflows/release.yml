@@ -26,11 +26,28 @@ jobs:
     name: Version or publish
     runs-on: ubuntu-latest
     steps:
+      # The default GITHUB_TOKEN cannot be used here. GitHub refuses to
+      # trigger workflow runs from events it creates, so the "Version
+      # Packages" pull request it opens gets no CI - the checks land in
+      # `action_required` and, because master requires them, the release
+      # cannot merge without someone approving the run by hand every time.
+      # A GitHub App token is not subject to that restriction.
+      - name: Mint release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v7
         with:
           # changesets needs the full history to work out which changesets are
           # new since the last release.
           fetch-depth: 0
+          # Persisted so the branch push changesets makes is attributed to the
+          # app rather than to github-actions[bot]. Pushing as the app is what
+          # actually makes CI run on the version pull request.
+          token: ${{ steps.app-token.outputs.token }}
 
       # Deliberately no `registry-url:` here. It makes setup-node write an
       # .npmrc containing a literal `${NODE_AUTH_TOKEN}` placeholder, and
@@ -81,4 +98,4 @@ jobs:
           title: "Version Packages"
           commit: "Version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
