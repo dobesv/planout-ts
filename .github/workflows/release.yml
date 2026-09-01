@@ -44,9 +44,9 @@ jobs:
           # changesets needs the full history to work out which changesets are
           # new since the last release.
           fetch-depth: 0
-          # Persisted so the branch push changesets makes is attributed to the
-          # app rather than to github-actions[bot]. Pushing as the app is what
-          # actually makes CI run on the version pull request.
+          # changesets still runs git locally to build the release commit, even
+          # though the push itself now goes through the GitHub API using the
+          # github-token input below.
           token: ${{ steps.app-token.outputs.token }}
 
       # Deliberately no `registry-url:` here. It makes setup-node write an
@@ -113,11 +113,13 @@ jobs:
       # So cutting a release is: merge PRs carrying changesets, then merge the
       # Version Packages PR the bot maintains.
       - name: Create version PR or publish to npm
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          version: yarn version-packages
-          publish: yarn release
-          title: "Version Packages"
-          commit: "Version packages"
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          # v2 removed support for supplying a token through the GITHUB_TOKEN
+          # environment variable; it has to be this input. Credentials
+          # persisted by actions/checkout are explicitly not a substitute.
+          github-token: ${{ steps.app-token.outputs.token }}
+          version-script: yarn version-packages
+          publish-script: yarn release
+          pr-title: "Version Packages"
+          commit-message: "Version packages"
