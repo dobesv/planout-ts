@@ -74,7 +74,7 @@ jobs:
       # So cutting a release is: merge PRs carrying changesets, then merge the
       # Version Packages PR the bot maintains.
       - name: Create version PR or publish to npm
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.1
         with:
           version: yarn version-packages
           publish: yarn release
