@@ -8,6 +8,11 @@
     "build:compiler": "jison src/planout.jison -o src/parser.js -m commonjs --moduleMain 'function(){}'",
     "build:js": "mkdir -p dist && cp src/*.js src/*.d.ts dist/ && tsc",
     "build:docs": "typedoc",
+    "changeset": "changeset",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "version-packages": "changeset version",
+    "release": "yarn build && changeset publish",
     "test": "jest && tsc --noEmit"
   },
   "homepage": "https://github.com/dobesv/planout-ts",
@@ -21,24 +26,26 @@
   "sideEffects": false,
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.15",
+    "lodash": "^4.18.1",
     "sha1": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "7.18.5",
-    "@babel/preset-env": "7.18.2",
-    "@babel/preset-typescript": "7.17.12",
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@babel/preset-typescript": "7.29.7",
+    "@changesets/cli": "2.31.1",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.14.182",
-    "@types/sha1": "1.1.3",
+    "@types/lodash": "4.17.25",
+    "@types/node": "26.4.0",
+    "@types/sha1": "1.1.5",
     "babel-jest": "30.5.1",
     "jest": "30.5.1",
-    "jest-fuzz": "0.0.1",
     "jison": "https://github.com/deathcap/jison.git#modulemain",
-    "jsdoc": "3.6.10",
-    "jsdoc-to-markdown": "7.1.1",
-    "prettier": "2.7.1",
-    "typedoc": "0.23.6",
-    "typescript": "4.7.4"
+    "prettier": "3.9.6",
+    "typedoc": "0.28.20",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

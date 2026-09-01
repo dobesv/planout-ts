@@ -1,55 +1,55 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`compile compiles sample test 1`] = `
-Object {
+{
   "op": "seq",
-  "seq": Array [
-    Object {
+  "seq": [
+    {
       "op": "set",
-      "value": Object {
-        "choices": Object {
+      "value": {
+        "choices": {
           "op": "array",
-          "values": Array [
+          "values": [
             1,
             10,
           ],
         },
         "op": "uniformChoice",
-        "unit": Object {
+        "unit": {
           "op": "get",
           "var": "userid",
         },
       },
       "var": "group_size",
     },
-    Object {
+    {
       "op": "set",
-      "value": Object {
+      "value": {
         "op": "bernoulliTrial",
         "p": 0.8,
-        "unit": Object {
+        "unit": {
           "op": "get",
           "var": "userid",
         },
       },
       "var": "specific_goal",
     },
-    Object {
-      "cond": Array [
-        Object {
-          "if": Object {
+    {
+      "cond": [
+        {
+          "if": {
             "op": "get",
             "var": "specific_goal",
           },
-          "then": Object {
+          "then": {
             "op": "seq",
-            "seq": Array [
-              Object {
+            "seq": [
+              {
                 "op": "set",
-                "value": Object {
-                  "choices": Object {
+                "value": {
+                  "choices": {
                     "op": "array",
-                    "values": Array [
+                    "values": [
                       8,
                       16,
                       32,
@@ -57,23 +57,23 @@ Object {
                     ],
                   },
                   "op": "uniformChoice",
-                  "unit": Object {
+                  "unit": {
                     "op": "get",
                     "var": "userid",
                   },
                 },
                 "var": "ratings_per_user_goal",
               },
-              Object {
+              {
                 "op": "set",
-                "value": Object {
+                "value": {
                   "op": "product",
-                  "values": Array [
-                    Object {
+                  "values": [
+                    {
                       "op": "get",
                       "var": "group_size",
                     },
-                    Object {
+                    {
                       "op": "get",
                       "var": "ratings_per_user_goal",
                     },

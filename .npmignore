@@ -7,6 +7,6 @@ yarn.lock
 package-lock.json
 .idea
 yarn-error.log
-.readthedocs.yml
-.travis.yml
+.changeset
+.github
 extras

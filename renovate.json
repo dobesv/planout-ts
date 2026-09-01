@@ -1,15 +1,24 @@
 {
-  "extends": [
-    "config:base"
-  ],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "automerge": false,
+  "automergeType": "pr",
+  "platformAutomerge": true,
   "packageRules": [
     {
-      "updateTypes": ["minor", "patch", "pin", "digest"],
+      "description": "Automerge non-major updates once CI is green",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
-      "depTypeList": ["devDependencies"],
-      "automerge": true
+      "description": "Major updates always get a human look",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "@changesets/cli 3.x requires yarn >= 4.5.2 and this repo is on yarn 1 classic, so 3.x cannot be installed. Drop this rule when the repo moves to yarn 4.",
+      "matchPackageNames": ["@changesets/cli"],
+      "allowedVersions": "<3"
     }
   ]
 }
