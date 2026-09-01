@@ -10,6 +10,15 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "outDir": "dist",
+    // TypeScript 6 turns `strict` on by default. This project was written
+    // against the pre-6 defaults and has 39 strictNullChecks/narrowing errors
+    // under it, so the old behaviour is pinned explicitly here. Turning strict
+    // on is a real source change, not a config flip - do it as its own commit.
+    "strict": false,
+    // TypeScript 6 requires rootDir to be explicit once the inferred common
+    // source directory could shift the output layout. Without it tsc fails
+    // with TS5011 and dist/ file paths are not guaranteed stable.
+    "rootDir": "src",
     "types": ["node", "jest"]
   }
 }
