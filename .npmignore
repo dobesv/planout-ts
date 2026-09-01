@@ -9,4 +9,6 @@ package-lock.json
 yarn-error.log
 .changeset
 .github
+.yarn
+.yarnrc.yml
 extras

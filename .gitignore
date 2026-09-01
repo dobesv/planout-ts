@@ -3,3 +3,12 @@ node_modules
 yarn-error.log
 .idea
 _build
+
+# Yarn 4 keeps its cache and resolution state under .yarn/. None of it belongs
+# in the repository: the global cache is machine-local, and install-state.gz is
+# a derived index. Yarn is pinned by the packageManager field in package.json
+# via Corepack rather than by a committed release binary, so .yarn/releases is
+# not expected either.
+.yarn/*
+!.yarn/patches
+.pnp.*

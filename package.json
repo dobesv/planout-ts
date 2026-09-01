@@ -47,5 +47,14 @@
   },
   "engines": {
     "node": ">=20.19"
+  },
+  "packageManager": "yarn@4.18.0",
+  "dependenciesMeta": {
+    "@parcel/watcher": {
+      "built": false
+    },
+    "unrs-resolver": {
+      "built": false
+    }
   }
 }
