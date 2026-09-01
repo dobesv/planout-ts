@@ -204,6 +204,15 @@ that lets you keep and analyze all the events separately.
 
 ### Development
 
+This project uses Yarn 4, pinned by the `packageManager` field in
+`package.json`. Corepack ships with Node and picks the right version up from
+there, so enable it once and `yarn` does the rest:
+
+```sh
+corepack enable
+yarn install
+```
+
 Run the tests and the typecheck:
 
 ```sh
