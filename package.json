@@ -39,7 +39,7 @@
     "@changesets/cli": "3.0.3",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.25",
-    "@types/node": "26.5.1",
+    "@types/node": "26.6.2",
     "@types/sha1": "1.1.5",
     "babel-jest": "30.5.2",
     "jest": "30.5.2",
